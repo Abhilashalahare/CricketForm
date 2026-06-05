@@ -198,11 +198,11 @@ setTimeout(() => {
           <div className="grid grid-cols-2 gap-4 mt-6">
             <input name="signatureName" placeholder="NAME (Signature)" onChange={handleInputChange} className="border-b border-gray-400 p-2" required />
             <input name="submissionDate" type="date" onChange={handleInputChange} className="border-b border-gray-400 p-2" required />
-            <input name="submissionPlace" placeholder="PLACE" onChange={handleInputChange} className="border-b border-gray-400 p-2" required />
+            <input  name="submissionPlace" placeholder="PLACE" onChange={handleInputChange} className="border-b border-gray-400 p-2" required />
           </div>
         </div>
 
-        <button type="submit" className="w-full bg-red-900 text-white py-4 font-bold hover:bg-black transition">
+        <button type="submit" className="w-full bg-red-900 text-white py-4 font-bold hover:bg-black transition cursor-pointer">
           SUBMIT APPLICATION
         </button>
       </form>

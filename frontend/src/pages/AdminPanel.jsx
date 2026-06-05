@@ -74,22 +74,25 @@ const AdminPanel = () => {
                 <td className="px-6 py-4">{p.mobileNumber}</td>
                 <td className="px-6 py-4">{p.cricheroesId || 'N/A'}</td>
                 <td className="px-6 py-4">{p.skills?.batting} / {p.skills?.bowling}</td>
-               <td className="px-6 py-4 flex items-center space-x-4">
-                  <button 
-                    onClick={() => navigate(`/admin/view/${p._id}`)} 
-                    className="text-blue-600 hover:text-blue-900 transition cursor-pointer"
-                    title="View Details"
-                  >
-                    <FaEye size={18} />
-                  </button>
-                  <button 
-                    onClick={() => deletePlayer(p._id)} 
-                    className="text-red-600 hover:text-red-800 transition cursor-pointer"
-                    title="Delete Player"
-                  >
-                    <FaTrash size={18} />
-                  </button>
-                </td>
+             <td className="px-6 py-4 flex items-center space-x-2">
+  {/* View Button */}
+  <button 
+    onClick={() => navigate(`/admin/view/${p._id}`)} 
+    className="p-2 rounded-md transition-all duration-200 text-blue-600 hover:bg-blue-600 hover:text-white border border-blue-600"
+    title="View Details"
+  >
+    <FaEye size={18} />
+  </button>
+
+  {/* Delete Button */}
+  <button 
+    onClick={() => deletePlayer(p._id)} 
+    className="p-2 rounded-md transition-all duration-200 text-red-600 hover:bg-red-600 hover:text-white border border-red-600"
+    title="Delete Player"
+  >
+    <FaTrash size={18} />
+  </button>
+</td>
               </tr>
             ))}
           </tbody>
