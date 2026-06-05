@@ -69,7 +69,7 @@ const AdminPanel = () => {
           <tbody className="divide-y divide-gray-200">
             {players.map((p, index) => (
               <tr key={p._id}>
-                <td className="px-6 py-4">{index + 1}</td>
+                <td className="px-6 py-4">{index + 1}.</td>
                 <td className="px-6 py-4">{p.fullName}</td>
                 <td className="px-6 py-4">{p.mobileNumber}</td>
                 <td className="px-6 py-4">{p.cricheroesId || 'N/A'}</td>

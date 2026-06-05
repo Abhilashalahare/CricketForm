@@ -57,7 +57,7 @@ const RegistrationForm = () => {
           bowling: formData.bowlingSkill,
           fieldingPreference: formData.fieldingPreference
         },
-        aadharNumber: '[Aadhaar Redacted]', 
+        aadharNumber: formData.aadharNumber,
         submissionDate: formData.submissionDate || new Date()
       };
 
@@ -65,13 +65,36 @@ const RegistrationForm = () => {
       await axios.post(`${baseUrl}/api/register`, payload);
       
       toast.success("Registration Successful!");
-      setFormData({
-        fullName: '', profession: '', photo: null, photoPreview: null, mobileNumber: '', 
-        whatsappNumber: '', emailId: '', residentialAddress: '', aadharNumber: '', 
-        paymentMethod: '', battingSkill: 'None', bowlingSkill: 'None', fieldingPreference: '',
-        cricheroesId: '', instagramId: '', declarationAccepted: false,
-        signatureName: '', submissionDate: '', submissionPlace: ''
-      });
+
+setFormData({
+  fullName: '',
+  profession: '',
+  photo: null,
+  photoPreview: null,
+  mobileNumber: '',
+  whatsappNumber: '',
+  emailId: '',
+  residentialAddress: '',
+  aadharNumber: '',
+  paymentMethod: '',
+  battingSkill: 'None',
+  bowlingSkill: 'None',
+  fieldingPreference: '',
+  cricheroesId: '',
+  instagramId: '',
+  declarationAccepted: false,
+  signatureName: '',
+  submissionDate: '',
+  submissionPlace: ''
+});
+
+if (fileInputRef.current) {
+  fileInputRef.current.value = '';
+}
+
+setTimeout(() => {
+  window.location.reload();
+}, 1500);
     } catch (err) {
       console.error("Submission Error:", err.response?.data || err);
       toast.error("Submission failed. Check console for details.");
@@ -93,10 +116,10 @@ const RegistrationForm = () => {
             
             <div className="flex flex-col gap-2">
               <label className="font-bold">PROFESSION:</label>
-              <div className="flex gap-4">
+              <div className="flex gap-4 ">
                 {['Business', 'Salaried', 'Self Employed'].map(p => (
-                  <label key={p} className="flex items-center gap-1 text-sm">
-                    <input type="radio" name="profession" value={p} checked={formData.profession === p} onChange={handleInputChange} required /> 
+                  <label key={p} className="flex items-center gap-1 text-sm cursor-pointer">
+                    <input className="cursor-pointer" type="radio" name="profession" value={p} checked={formData.profession === p} onChange={handleInputChange} required /> 
                     {p}
                   </label>
                 ))}
@@ -135,8 +158,8 @@ const RegistrationForm = () => {
               {['Batting', 'Bowling'].map(skill => (
                 <tr key={skill}>
                   <td>{skill}</td>
-                  <td><input type="radio" name={`${skill.toLowerCase()}Skill`} value="Right Hand" onChange={handleInputChange} /></td>
-                  <td><input type="radio" name={`${skill.toLowerCase()}Skill`} value="Left Hand" onChange={handleInputChange} /></td>
+                  <td><input className="cursor-pointer" type="radio" name={`${skill.toLowerCase()}Skill`} value="Right Hand" onChange={handleInputChange} /></td>
+                  <td><input className="cursor-pointer" type="radio" name={`${skill.toLowerCase()}Skill`} value="Left Hand" onChange={handleInputChange} /></td>
                 </tr>
               ))}
             </tbody>
@@ -149,10 +172,28 @@ const RegistrationForm = () => {
           <input name="cricheroesId" placeholder="CRICHEROES ID" onChange={handleInputChange} className="w-full border-b border-gray-400 p-2" />
           <input name="instagramId" placeholder="INSTAGRAM ID" onChange={handleInputChange} className="w-full border-b border-gray-400 p-2" />
           
-          <label className="flex items-start gap-2 text-sm">
-            <input type="checkbox" name="declarationAccepted" onChange={handleInputChange} required className="mt-1" />
-            I hereby declare that all information provided is true and correct.
-          </label>
+         <div className="space-y-4 border border-gray-300 p-6 bg-gray-50 rounded-lg">
+  <h2 className="text-xl font-bold border-b-2 border-red-900 text-red-900 pb-2">DECLARATION</h2>
+  
+  <ul className="list-disc list-outside ml-5 text-sm space-y-2 text-gray-700">
+    <li>I hereby declare that all the information provided by me in this registration form is true and correct to the best of my knowledge.</li>
+    <li>I agree to abide by all the rules, regulations, and decisions of the organizers of the <strong>JAIN YOUTH CRICKET CUP</strong>.</li>
+    <li>I understand that any false information or misconduct may result in the cancellation of my registration or participation in the tournament.</li>
+    <li>I further agree that the organizers reserve the right to amend the tournament schedule, rules, regulations, fixtures, and event format whenever necessary in the interest of the tournament.</li>
+  </ul>
+
+  {/* Required Agreement Checkbox */}
+  <label className="flex items-start gap-2 text-sm font-bold pt-4">
+    <input 
+      type="checkbox" 
+      name="declarationAccepted" 
+      onChange={handleInputChange} 
+      required 
+      className="mt-1 cursor-pointer" 
+    />
+    I have read the declaration above and I agree to all the terms and conditions mentioned.
+  </label>
+</div>
           
           <div className="grid grid-cols-2 gap-4 mt-6">
             <input name="signatureName" placeholder="NAME (Signature)" onChange={handleInputChange} className="border-b border-gray-400 p-2" required />

@@ -44,24 +44,49 @@ if (!player) return <FullScreenLoader />;
       <h1 className="text-2xl font-black mb-6 text-red-900 border-b pb-2">PLAYER PROFILE</h1>
       
       {/* Display the Base64 photo if it exists */}
-      {player.photo && (
-        <img src={player.photo} alt="Player" className="w-40 h-40 object-cover mb-6 border-2 border-red-900" />
-      )}
+     <div className="flex flex-col md:flex-row gap-8">
+  {/* Left Side: Information Grid */}
+ <div className="flex-1 grid grid-cols-2 gap-5 text-sm">
+  <div><p className="font-bold text-gray-500">FULL NAME</p><p>{player.fullName}</p></div>
+  <div><p className="font-bold text-gray-500">PROFESSION</p><p>{player.profession}</p></div>
+  <div><p className="font-bold text-gray-500">MOBILE</p><p>{player.mobileNumber}</p></div>
+  <div><p className="font-bold text-gray-500">WHATSAPP</p><p>{player.whatsappNumber}</p></div>
+  <div><p className="font-bold text-gray-500">EMAIL</p><p>{player.emailId}</p></div>
+  <div><p className="font-bold text-gray-500">PAYMENT METHOD</p><p>{player.paymentMethod || 'N/A'}</p></div>
+   <div><p className="font-bold text-gray-500">ADDRESS</p><p>{player.residentialAddress}</p></div>
 
-      <div className="grid grid-cols-2 gap-6 text-sm">
-        <div><p className="font-bold text-gray-500">FULL NAME</p><p>{player.fullName}</p></div>
-        <div><p className="font-bold text-gray-500">PROFESSION</p><p>{player.profession}</p></div>
-        <div><p className="font-bold text-gray-500">MOBILE</p><p>{player.mobileNumber}</p></div>
-        <div><p className="font-bold text-gray-500">WHATSAPP</p><p>{player.whatsappNumber}</p></div>
-        <div><p className="font-bold text-gray-500">EMAIL</p><p>{player.emailId}</p></div>
-        <div><p className="font-bold text-gray-500">BATTING</p><p>{player.skills?.batting}</p></div>
-        <div><p className="font-bold text-gray-500">BOWLING</p><p>{player.skills?.bowling}</p></div>
-        <div className="col-span-2"><p className="font-bold text-gray-500">ADDRESS</p><p>{player.residentialAddress}</p></div>
-        <div><p className="font-bold text-gray-500">CRIC HEROES ID</p><p>{player.cricheroesId || 'N/A'}</p></div>
-        <div><p className="font-bold text-gray-500">INSTAGRAM ID</p><p>{player.instagramId || 'N/A'}</p></div>
-        <div><p className="font-bold text-gray-500">SUBMISSION DATE</p><p>{new Date(player.submissionDate).toLocaleDateString()}</p></div>
-      </div>
+   
 
+  <div><p className="font-bold text-gray-500">BATTING</p><p>{player.skills?.batting}</p></div>
+  <div><p className="font-bold text-gray-500">BOWLING</p><p>{player.skills?.bowling}</p></div>
+  <div><p className="font-bold text-gray-500">FIELDING PREFERENCE</p><p>{player.skills?.fieldingPreference || 'N/A'}</p></div>
+  
+  <div><p className="font-bold text-gray-500">CRIC HEROES ID</p><p>{player.cricheroesId || 'N/A'}</p></div>
+  <div><p className="font-bold text-gray-500">INSTAGRAM ID</p><p>{player.instagramId || 'N/A'}</p></div>
+  
+ 
+  <div><p className="font-bold text-gray-500">AADHAR NUMBER</p><p className="font-mono">{player.aadharNumber}</p></div>
+  
+  <div><p className="font-bold text-gray-500">SUBMISSION DATE</p><p>{new Date(player.submissionDate).toLocaleDateString()}</p></div>
+  <div><p className="font-bold text-gray-500">PLACE</p><p>{player.submissionPlace || 'N/A'}</p></div>
+  
+  <div className="col-span-2 mt-4 p-4 bg-gray-50 border-l-4 border-red-900">
+    <p className="font-bold text-gray-500">SIGNATURE NAME</p>
+    <p className="italic text-lg">{player.signatureName}</p>
+  </div>
+</div>
+
+  {/* Right Side: Photo */}
+  <div className="flex-shrink-0">
+    {player.photo && (
+      <img 
+        src={player.photo} 
+        alt="Player" 
+        className="w-32 h-40 object-cover border-2 border-red-900" 
+      />
+    )}
+  </div>
+</div>
       <button 
         onClick={() => navigate('/admin')} 
         className="mt-8 bg-black text-white px-6 py-2 rounded hover:bg-red-900"
