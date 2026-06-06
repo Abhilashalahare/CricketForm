@@ -5,7 +5,7 @@ import {
   getAllPlayers, 
   getPlayerById, 
   deletePlayer 
-} from '../controllers/playerController.js';
+} from '../controllers/PlayerController.js';
 
 const router = express.Router();
 
