@@ -9,7 +9,8 @@ import { FaUpload } from 'react-icons/fa';
 const RegistrationForm = () => {
   const fileInputRef = useRef(null);
   const receiptInputRef = useRef(null);
-
+  
+  const [submitting, setSubmitting] = useState(false);
 const [formData, setFormData] = useState({
   // Personal Details
   fullName: '',
@@ -78,6 +79,7 @@ const [formData, setFormData] = useState({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
 
     if (!formData.utrReceipt) {
       toast.error("Please upload your payment receipt.");
@@ -131,6 +133,7 @@ const [formData, setFormData] = useState({
       await axios.post(`${baseUrl}/api/register`, payload);
 
       toast.success("Registration Successful!");
+      // setFormData(initialState); // Reset form data to initial state
 
       setFormData({
         fullName: '',
@@ -187,7 +190,9 @@ const [formData, setFormData] = useState({
     } else {
       toast.error("Registration failed. Please check your internet or contact support.");
     }
-  }
+  }finally {
+      setSubmitting(false); 
+    }
   };
 
   return (
@@ -404,9 +409,23 @@ const [formData, setFormData] = useState({
           </div>
         </div>
 
-        <button type="submit" className="w-full bg-red-900 text-white py-4 font-bold hover:bg-black transition cursor-pointer">
-          SUBMIT APPLICATION
-        </button>
+       <button 
+  type="submit" 
+  disabled={submitting} // Prevents double-submission
+  className={`w-full py-4 font-bold transition cursor-pointer flex items-center justify-center ${
+    submitting ? 'bg-gray-600' : 'bg-red-900 hover:bg-black'
+  } text-white`}
+>
+  {submitting ? (
+    <div className="flex items-center gap-2">
+      {/* Simple Tailwind Spinner */}
+      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+      
+    </div>
+  ) : (
+    "SUBMIT APPLICATION"
+  )}
+</button>
       </form>
 
       <div className="flex flex-col items-end gap-0">
