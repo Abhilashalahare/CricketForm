@@ -4,12 +4,39 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import LogoutButton from '../components/LogoutButton';
 import FullScreenLoader from '../components/FullScreenLoader';
-import { FaEye, FaTrash } from 'react-icons/fa';
+import { FaEye, FaTrash, FaFileExcel } from 'react-icons/fa'; 
+import { CSVLink } from 'react-csv';
+
 
 const AdminPanel = () => {
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+const exportData = players.map((p, index) => ({
+    "S.No": index + 1,
+    "Full Name": p.fullName,
+    "Profession": p.profession,
+    "Mobile": p.mobileNumber,
+    "WhatsApp": p.whatsappNumber || 'N/A',
+    "Email": p.emailId,
+    "Address": p.residentialAddress,
+    "Aadhar Number": p.aadharNumber,
+    "UTR Number": p.utrNumber,
+    "Jersey Name": p.jerseyName,
+    "Jersey No": p.jerseyNumber,
+    "Jersey Size": p.jerseySize,
+    "Lower Size": p.lowerSize,
+    "Batting": p.skills?.batting || 'None',
+    "Bowling": p.skills?.bowling || 'None',
+    "Wicket Keeping": p.wicketKeeping,
+    "Fielding Preference": p.skills?.fieldingPreference || 'N/A',
+    "CricHeroes ID": p.cricheroesId || 'N/A',
+    "Instagram ID": p.instagramId || 'N/A',
+    "Submission Date": new Date(p.submissionDate).toLocaleDateString(),
+    "Submission Place": p.submissionPlace,
+    "Signature": p.signatureName
+  }));
 
   useEffect(() => {
     fetchPlayers();
@@ -47,59 +74,74 @@ const AdminPanel = () => {
 
   if (loading) return <FullScreenLoader/>
 
-  return (
+return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">PLAYER REGISTRATIONS</h1>
-        <LogoutButton />
+        <div className="flex gap-4">
+          {/* EXCEL EXPORT BUTTON */}
+          <CSVLink 
+            data={exportData} 
+            filename={"player_registrations.csv"}
+            className="flex items-center gap-2 bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800 transition text-sm font-bold"
+          >
+            <FaFileExcel /> EXPORT EXCEL
+          </CSVLink>
+          <LogoutButton />
+        </div>
       </div>
     
       <div className="bg-white shadow rounded-xl overflow-x-auto">
-        <table className="w-full text-sm text-left">
-          <thead className="bg-gray-100 uppercase text-xs font-bold">
-            <tr>
-              <th className="px-6 py-4">S.No</th>
-              <th className="px-6 py-4">Name</th>
-              <th className="px-6 py-4">Phone</th>
-              <th className="px-6 py-4">CricHeroes ID</th>
-              <th className="px-6 py-4">Skills</th>
-              <th className="px-6 py-4">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {players.map((p, index) => (
-              <tr key={p._id}>
-                <td className="px-6 py-4">{index + 1}.</td>
-                <td className="px-6 py-4">{p.fullName}</td>
-                <td className="px-6 py-4">{p.mobileNumber}</td>
-                <td className="px-6 py-4">{p.cricheroesId || 'N/A'}</td>
-                <td className="px-6 py-4">{p.skills?.batting} / {p.skills?.bowling}</td>
-             <td className="px-6 py-4 flex items-center space-x-2">
-  {/* View Button */}
-  <button 
-    onClick={() => navigate(`/admin/view/${p._id}`)} 
-    className="p-2 rounded-md transition-all duration-200 text-blue-600 hover:bg-blue-600 hover:text-white border border-blue-600"
-    title="View Details"
-  >
-    <FaEye size={18} />
-  </button>
-
-  {/* Delete Button */}
-  <button 
-    onClick={() => deletePlayer(p._id)} 
-    className="p-2 rounded-md transition-all duration-200 text-red-600 hover:bg-red-600 hover:text-white border border-red-600"
-    title="Delete Player"
-  >
-    <FaTrash size={18} />
-  </button>
-</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+  <table className="w-full text-sm text-left">
+    <thead className="bg-gray-100 uppercase text-xs font-bold">
+      <tr>
+        <th className="px-6 py-4">S.No</th>
+        <th className="px-6 py-4">Image</th>
+        <th className="px-6 py-4">Name</th>
+        <th className="px-6 py-4">Phone</th>
+        <th className="px-6 py-4">CricHeroes ID</th>
+        <th className="px-6 py-4">Skills</th>
+        <th className="px-6 py-4">Actions</th>
+      </tr>
+    </thead>
+    <tbody className="divide-y divide-gray-200">
+      {players.map((p, index) => (
+        <tr key={p._id}>
+          <td className="px-6 py-4">{index + 1}.</td>
+          <td className="px-6 py-4">
+            {p.photo ? (
+              <img src={p.photo} alt="Player" className="w-12 h-12 object-cover rounded-full border border-gray-300" />
+            ) : (
+              <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-[10px]">N/A</div>
+            )}
+          </td>
+          <td className="px-6 py-4">{p.fullName}</td>
+          <td className="px-6 py-4">{p.mobileNumber}</td>
+          <td className="px-6 py-4">{p.cricheroesId || 'N/A'}</td>
+          <td className="px-6 py-4">{p.skills?.batting} / {p.skills?.bowling}</td>
+          <td className="px-6 py-4 flex items-center space-x-2">
+            <button 
+              onClick={() => navigate(`/admin/view/${p._id}`)} 
+              className="p-2 rounded-md transition-all duration-200 cursor-pointer text-blue-600 hover:bg-blue-600 hover:text-white border border-blue-600"
+              title="View Details"
+            >
+              <FaEye size={18} />
+            </button>
+            <button 
+              onClick={() => deletePlayer(p._id)} 
+              className="p-2 rounded-md transition-all duration-200 cursor-pointer text-red-600 hover:bg-red-600 hover:text-white border border-red-600"
+              title="Delete Player"
+            >
+              <FaTrash size={18} />
+            </button>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
     </div>
   );
 };
-
+ 
 export default AdminPanel;
