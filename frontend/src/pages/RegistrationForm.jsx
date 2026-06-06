@@ -101,7 +101,8 @@ const [formData, setFormData] = useState({
 
       let utrReceiptBase64 = null;
       if (formData.utrReceipt) utrReceiptBase64 = await convertToBase64(formData.utrReceipt);
-
+    
+      
 
       const payload = {
         ...formData,
@@ -126,6 +127,7 @@ const [formData, setFormData] = useState({
       };
 
       const baseUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+      console.log("Final Payload being sent:", payload);
       await axios.post(`${baseUrl}/api/register`, payload);
 
       toast.success("Registration Successful!");
@@ -213,12 +215,53 @@ const [formData, setFormData] = useState({
               </div>
             </div>
 
-            <input name="mobileNumber" placeholder="MOBILE NUMBER" onChange={handleInputChange} className="w-full border-b border-gray-400 p-2" required />
-            <input name="whatsappNumber" placeholder="WHATSAPP NUMBER" onChange={handleInputChange} className="w-full border-b border-gray-400 p-2" />
+            <input 
+  type="text"
+  name="mobileNumber" 
+  placeholder="MOBILE NUMBER" 
+  inputMode="numeric"
+  pattern="\d{10}" 
+  maxLength="10"
+  onChange={(e) => {
+    // Only allow numbers to be typed
+    const value = e.target.value.replace(/\D/g, "");
+    handleInputChange({ target: { name: 'mobileNumber', value } });
+  }}
+  value={formData.mobileNumber}
+  className="w-full border-b border-gray-400 p-2" 
+  required 
+/>
+           <input 
+  type="text"
+  name="whatsappNumber" 
+  placeholder="WHATSAPP NUMBER" 
+  inputMode="numeric"
+  pattern="\d{10}" 
+  maxLength="10"
+  onChange={(e) => {
+    const value = e.target.value.replace(/\D/g, "");
+    handleInputChange({ target: { name: 'whatsappNumber', value } });
+  }}
+  value={formData.whatsappNumber}
+  className="w-full border-b border-gray-400 p-2" 
+/>
             <input name="emailId" type="email" placeholder="EMAIL ID" onChange={handleInputChange} className="w-full border-b border-gray-400 p-2" required />
             <input name="residentialAddress" placeholder="RESIDENTIAL ADDRESS" onChange={handleInputChange} className="w-full border-b border-gray-400 p-2" />
-            <input name="aadharNumber" placeholder="AADHAR NUMBER" onChange={handleInputChange} className="w-full border-b border-gray-400 p-2" required />
-
+            <input 
+  type="text"
+  name="aadharNumber" 
+  placeholder="AADHAR NUMBER" 
+  inputMode="numeric"
+  pattern="\d{12}" 
+  maxLength="12"
+  onChange={(e) => {
+    const value = e.target.value.replace(/\D/g, "");
+    handleInputChange({ target: { name: 'aadharNumber', value } });
+  }}
+  value={formData.aadharNumber}
+  className="w-full border-b border-gray-400 p-2" 
+  required 
+/>
             {/* UTR NUMBER AND RECEIPT UPLOAD (Side-by-side) */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
               <input name="utrNumber" placeholder="UTR NUMBER" onChange={handleInputChange} className="w-full border-b border-gray-400 p-2" />

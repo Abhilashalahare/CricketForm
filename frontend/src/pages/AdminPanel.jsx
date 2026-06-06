@@ -6,6 +6,7 @@ import LogoutButton from '../components/LogoutButton';
 import FullScreenLoader from '../components/FullScreenLoader';
 import { FaEye, FaTrash, FaFileExcel } from 'react-icons/fa'; 
 import { CSVLink } from 'react-csv';
+import logo from '../assets/logo.png';
 
 
 const AdminPanel = () => {
@@ -75,11 +76,13 @@ const exportData = players.map((p, index) => ({
   if (loading) return <FullScreenLoader/>
 
 return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">PLAYER REGISTRATIONS</h1>
+    <div className="min-h-screen bg-gray-50">
+      
+      {/* 1. TOP NAVIGATION BAR */}
+      <nav className="bg-white shadow-sm px-8 py-4 flex justify-between items-center border-b border-gray-200">
+        <img src={logo} alt="Organization Logo" className="h-10 w-auto" />
+        
         <div className="flex gap-4">
-          {/* EXCEL EXPORT BUTTON */}
           <CSVLink 
             data={exportData} 
             filename={"player_registrations.csv"}
@@ -89,59 +92,64 @@ return (
           </CSVLink>
           <LogoutButton />
         </div>
-      </div>
-    
-      <div className="bg-white shadow rounded-xl overflow-x-auto">
-  <table className="w-full text-sm text-left">
-    <thead className="bg-gray-100 uppercase text-xs font-bold">
-      <tr>
-        <th className="px-6 py-4">S.No</th>
-        <th className="px-6 py-4">Image</th>
-        <th className="px-6 py-4">Name</th>
-        <th className="px-6 py-4">Phone</th>
-        <th className="px-6 py-4">CricHeroes ID</th>
-        <th className="px-6 py-4">Skills</th>
-        <th className="px-6 py-4">Actions</th>
-      </tr>
-    </thead>
-    <tbody className="divide-y divide-gray-200">
-      {players.map((p, index) => (
-        <tr key={p._id}>
-          <td className="px-6 py-4">{index + 1}.</td>
-          <td className="px-6 py-4">
-            {p.photo ? (
-              <img src={p.photo} alt="Player" className="w-12 h-12 object-cover rounded-full border border-gray-300" />
-            ) : (
-              <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-[10px]">N/A</div>
-            )}
-          </td>
-          <td className="px-6 py-4">{p.fullName}</td>
-          <td className="px-6 py-4">{p.mobileNumber}</td>
-          <td className="px-6 py-4">{p.cricheroesId || 'N/A'}</td>
-          <td className="px-6 py-4">{p.skills?.batting} / {p.skills?.bowling}</td>
-          <td className="px-6 py-4 flex items-center space-x-2">
-            <button 
-              onClick={() => navigate(`/admin/view/${p._id}`)} 
-              className="p-2 rounded-md transition-all duration-200 cursor-pointer text-blue-600 hover:bg-blue-600 hover:text-white border border-blue-600"
-              title="View Details"
-            >
-              <FaEye size={18} />
-            </button>
-            <button 
-              onClick={() => deletePlayer(p._id)} 
-              className="p-2 rounded-md transition-all duration-200 cursor-pointer text-red-600 hover:bg-red-600 hover:text-white border border-red-600"
-              title="Delete Player"
-            >
-              <FaTrash size={18} />
-            </button>
-          </td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-</div>
+      </nav>
+
+      {/* 2. MAIN CONTENT AREA */}
+      <main className="p-4 md:p-8">
+        <h1 className="text-2xl font-bold mb-6">PLAYER REGISTRATIONS</h1>
+        
+        <div className="bg-white shadow rounded-xl overflow-x-auto">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-gray-100 uppercase text-xs font-bold">
+              <tr>
+                <th className="px-6 py-4">S.No</th>
+                <th className="px-6 py-4">Image</th>
+                <th className="px-6 py-4">Name</th>
+                <th className="px-6 py-4">Phone</th>
+                <th className="px-6 py-4">CricHeroes ID</th>
+                <th className="px-6 py-4">Skills</th>
+                <th className="px-6 py-4">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {players.map((p, index) => (
+                <tr key={p._id}>
+                  <td className="px-6 py-4">{index + 1}.</td>
+                  <td className="px-6 py-4">
+                    {p.photo ? (
+                      <img src={p.photo} alt="Player" className="w-12 h-12 object-cover rounded-full border border-gray-300" />
+                    ) : (
+                      <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-[10px]">N/A</div>
+                    )}
+                  </td>
+                  <td className="px-6 py-4">{p.fullName}</td>
+                  <td className="px-6 py-4">{p.mobileNumber}</td>
+                  <td className="px-6 py-4">{p.cricheroesId || 'N/A'}</td>
+                  <td className="px-6 py-4">{p.skills?.batting} / {p.skills?.bowling}</td>
+                  <td className="px-6 py-4 flex items-center space-x-2">
+                    <button 
+                      onClick={() => navigate(`/admin/view/${p._id}`)} 
+                      className="p-2 rounded-md transition-all duration-200 cursor-pointer text-blue-600 hover:bg-blue-600 hover:text-white border border-blue-600"
+                      title="View Details"
+                    >
+                      <FaEye size={18} />
+                    </button>
+                    <button 
+                      onClick={() => deletePlayer(p._id)} 
+                      className="p-2 rounded-md transition-all duration-200 cursor-pointer text-red-600 hover:bg-red-600 hover:text-white border border-red-600"
+                      title="Delete Player"
+                    >
+                      <FaTrash size={18} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </main>
     </div>
   );
 };
- 
+
 export default AdminPanel;
