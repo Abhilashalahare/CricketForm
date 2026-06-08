@@ -446,7 +446,7 @@ const RegistrationForm = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-4 mt-6">
-              <input name="signatureName" value={formData.submissionDate} placeholder="NAME (Signature)" onChange={handleInputChange} className="border-b border-gray-400 p-2" required />
+              <input name="signatureName" value={formData.signatureName} placeholder="NAME (Signature)" onChange={handleInputChange} className="border-b border-gray-400 p-2" required />
               <input name="submissionDate" value={formData.submissionDate} type="date" onChange={handleInputChange} className="border-b border-gray-400 p-2" required />
               <input name="submissionPlace" value={formData.submissionPlace} placeholder="PLACE" onChange={handleInputChange} className="border-b border-gray-400 p-2" required />
             </div>
