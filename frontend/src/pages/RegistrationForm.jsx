@@ -3,8 +3,36 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import logo from '../assets/logo.png';
 import { FaUpload } from 'react-icons/fa';
+import bgimage from '../assets/bgimage.jpeg';
 
-
+const initialFormState = {
+  fullName: '',
+  profession: '',
+  photo: null,
+  photoPreview: null,
+  mobileNumber: '',
+  whatsappNumber: '',
+  emailId: '',
+  residentialAddress: '',
+  aadharNumber: '',
+  utrNumber: '',
+  utrReceipt: null,
+  utrReceiptPreview: null,
+  battingSkill: 'None',
+  bowlingSkill: 'None',
+  fieldingPreference: '',
+  cricheroesId: '',
+  instagramId: '',
+  declarationAccepted: false,
+  signatureName: '',
+  submissionDate: '',
+  submissionPlace: '',
+  jerseyName: '',
+  jerseyNumber: '',
+  jerseySize: 'S',
+  lowerSize: '',
+  wicketKeeping: 'No',
+};
 
 const RegistrationForm = () => {
   const fileInputRef = useRef(null);
@@ -30,7 +58,7 @@ const [formData, setFormData] = useState({
   jerseyName: '',
   jerseyNumber: '',
   jerseySize: 'S',
-  lowerSize: 'S',
+  lowerSize: '',
   wicketKeeping: 'No',
   
   // Skills & Social
@@ -79,12 +107,14 @@ const [formData, setFormData] = useState({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitting(true);
+    if (submitting) return; // Prevent double submission
 
     if (!formData.utrReceipt) {
       toast.error("Please upload your payment receipt.");
       return;
     }
+
+    setSubmitting(true);
 
     const convertToBase64 = (file) => {
       return new Promise((resolve, reject) => {
@@ -120,7 +150,7 @@ const [formData, setFormData] = useState({
         jerseyName: formData.jerseyName,
         jerseyNumber: formData.jerseyNumber,
         jerseySize: formData.jerseySize || 'S',
-        lowerSize: formData.lowerSize || 'S',
+        lowerSize: formData.lowerSize  ,
         wicketKeeping: formData.wicketKeeping || 'No',
         submissionDate: formData.submissionDate || new Date(),
         submissionPlace: formData.submissionPlace,
@@ -133,38 +163,7 @@ const [formData, setFormData] = useState({
       await axios.post(`${baseUrl}/api/register`, payload);
 
       toast.success("Registration Successful!");
-      // setFormData(initialState); // Reset form data to initial state
-
-      setFormData({
-        fullName: '',
-        profession: '',
-        photo: null,
-        photoPreview: null,
-        mobileNumber: '',
-        whatsappNumber: '',
-        emailId: '',
-        residentialAddress: '',
-        aadharNumber: '',
-        utrNumber: '',
-        utrReceipt: null,
-        utrReceiptPreview: null,
-        paymentMethod: '',
-        battingSkill: 'None',
-        bowlingSkill: 'None',
-        fieldingPreference: '',
-        cricheroesId: '',
-        instagramId: '',
-        declarationAccepted: false,
-        signatureName: '',
-        submissionDate: '',
-        submissionPlace: '',
-        jerseyName: '',
-        jerseySize: 'S',
-        lowerSize: 'S',
-        jerseyNumber: '',
-        wicketKeeping: 'No',
-
-      });
+      setFormData(initialFormState); // Reset form data to initial state
 
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
@@ -174,9 +173,7 @@ const [formData, setFormData] = useState({
         receiptInputRef.current.value = '';
       }
 
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500);
+      
     } catch (err) {
     console.error("Submission Error Details:", err.response?.data);
     
@@ -196,24 +193,58 @@ const [formData, setFormData] = useState({
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-8 bg-white shadow-lg space-y-8">
-      <div className="text-center border-b-4 border-red-900 pb-4">
-        <h1 className="text-3xl font-black text-red-900">JAIN YOUTH CRICKET CUP</h1>
-        <h2 className="text-xl font-bold mt-2">OFFICIAL PLAYER REGISTRATION FORM</h2>
-      </div>
+<div
+  className="min-h-screen flex justify-center items-start"
+  style={{
+    backgroundImage: `url(${bgimage})`,
+    backgroundSize: "contain",
+    backgroundPosition: "center top",
+    backgroundColor: "#f5f5f5",
+   
+    
+  }}
+>
+  <div className="max-w-3xl w-full p-8  bg-white shadow-2xl space-y-8">
+    <div className="border-b-4 border-red-900 pb-4">
+  <div className="hidden md:flex justify-between items-start">
+    <div>
+      <h1 className="text-4xl font-black text-red-900">
+        JAIN YOUTH CRICKET CUP
+      </h1>
+      <h2 className="text-2xl font-bold mt-2">
+        OFFICIAL PLAYER REGISTRATION FORM
+      </h2>
+    </div>
 
-      <form onSubmit={handleSubmit} className="space-y-8">
+    <img
+      src={logo}
+      alt="Logo"
+      className="w-24 h-24 object-contain"
+    />
+  </div>
+
+  <div className="md:hidden text-center">
+    <h1 className="text-2xl font-black text-red-900">
+      JAIN YOUTH CRICKET CUP
+    </h1>
+    <h2 className="text-lg font-bold mt-2">
+      OFFICIAL PLAYER REGISTRATION FORM
+    </h2>
+  </div>
+</div>
+
+      <form onSubmit={handleSubmit} className="space-y-8 ">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="md:col-span-3 space-y-4">
             <h2 className="text-xl font-bold border-b-2 border-red-900">PERSONAL DETAILS</h2>
-            <input name="fullName" placeholder="FULL NAME" onChange={handleInputChange} className="w-full border-b border-gray-400 p-2" required />
+            <input name="fullName" value={formData.fullName} placeholder="FULL NAME" onChange={handleInputChange} className="w-full border-b border-gray-400 p-2" required />
 
             <div className="flex flex-col gap-2">
               <label className="font-bold">PROFESSION:</label>
               <div className="flex gap-4 ">
                 {['Business', 'Salaried', 'Self Employed'].map(p => (
                   <label key={p} className="flex items-center gap-1 text-sm cursor-pointer">
-                    <input className="cursor-pointer" type="radio" name="profession" value={p} checked={formData.profession === p} onChange={handleInputChange} required />
+                    <input  className="cursor-pointer" type="radio" name="profession" value={p} checked={formData.profession === p} onChange={handleInputChange} required />
                     {p}
                   </label>
                 ))}
@@ -250,8 +281,8 @@ const [formData, setFormData] = useState({
   value={formData.whatsappNumber}
   className="w-full border-b border-gray-400 p-2" 
 />
-            <input name="emailId" type="email" placeholder="EMAIL ID" onChange={handleInputChange} className="w-full border-b border-gray-400 p-2" required />
-            <input name="residentialAddress" placeholder="RESIDENTIAL ADDRESS" onChange={handleInputChange} className="w-full border-b border-gray-400 p-2" />
+            <input name="emailId" type="email" value={formData.emailId} placeholder="EMAIL ID" onChange={handleInputChange} className="w-full border-b border-gray-400 p-2" required />
+            <input name="residentialAddress" value={formData.residentialAddress} placeholder="RESIDENTIAL ADDRESS" onChange={handleInputChange} className="w-full border-b border-gray-400 p-2" />
             <input 
   type="text"
   name="aadharNumber" 
@@ -269,7 +300,7 @@ const [formData, setFormData] = useState({
 />
             {/* UTR NUMBER AND RECEIPT UPLOAD (Side-by-side) */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-              <input name="utrNumber" placeholder="UTR NUMBER" onChange={handleInputChange} className="w-full border-b border-gray-400 p-2" />
+              <input name="utrNumber" placeholder="UTR NUMBER" value={formData.utrNumber} onChange={handleInputChange} className="w-full border-b border-gray-400 p-2" />
 
               <div className="md:col-span-1">
                 {/* Clickable UTR Receipt Preview */}
@@ -297,21 +328,31 @@ const [formData, setFormData] = useState({
             <div className="space-y-4 mt-6">
               <h2 className=" font-bold border-b-2 border-red-900">KIT DETAILS</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input name="jerseyName" placeholder="JERSEY NAME" onChange={handleInputChange} className="w-full border-b border-gray-400 p-2" />
-                <input name="jerseyNumber" type="number" placeholder="JERSEY NO." onChange={handleInputChange} className="w-full border-b border-gray-400 p-2" />
+                <input name="jerseyName" value={formData.jerseyName} placeholder="JERSEY NAME" onChange={handleInputChange} className="w-full border-b border-gray-400 p-2" />
+                <input name="jerseyNumber" type="number" value={formData.jerseyNumber} placeholder="JERSEY NO." onChange={handleInputChange} className="w-full border-b border-gray-400 p-2" />
 
                 <div>
                   <label className="text-xs font-bold text-gray-500">JERSEY SIZE:</label>
-                  <select name="jerseySize" onChange={handleInputChange} className="w-full border-b border-gray-400 p-2 bg-transparent">
+                  <select name="jerseySize" value={formData.jerseySize} onChange={handleInputChange} className="w-full border-b border-gray-400 p-2 bg-transparent">
                     {['S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'XXXXL'].map(size => <option key={size} value={size}>{size}</option>)}
                   </select>
                 </div>
-                <div>
-                  <label className="text-xs font-bold text-gray-500">LOWER SIZE:</label>
-                  <select name="lowerSize" onChange={handleInputChange} className="w-full border-b border-gray-400 p-2 bg-transparent">
-                    {['S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'XXXXL'].map(size => <option key={size} value={size}>{size}</option>)}
-                  </select>
-                </div>
+               <div>
+  <label className="text-xs font-bold text-gray-500 ">LOWER SIZE:</label>
+  <input 
+    type="text" 
+    name="lowerSize" 
+    placeholder="e.g. 30" 
+    maxLength="2" 
+    value={formData.lowerSize}
+    onChange={(e) => {
+      // Only allow numbers
+      const value = e.target.value.replace(/\D/g, "");
+      handleInputChange({ target: { name: 'lowerSize', value } });
+    }}
+    className="w-full border-b border-gray-400 p-2 bg-transparent" 
+  />
+</div>
               </div>
             </div>
           </div>
@@ -428,10 +469,18 @@ const [formData, setFormData] = useState({
 </button>
       </form>
 
-      <div className="flex flex-col items-end gap-0">
-        <p className="text-sm">Powered by</p>
-        <img src={logo} className="h-8" alt="Logo" />
-      </div>
+     <div className="md:hidden mt-2 flex justify-end">
+  <img
+    src={logo}
+    alt="Company Logo"
+    className="w-20 object-contain"
+  />
+</div>
+
+     
+    </div>
+
+    
     </div>
   );
 };

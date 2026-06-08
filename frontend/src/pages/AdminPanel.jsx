@@ -9,10 +9,46 @@ import { CSVLink } from 'react-csv';
 import logo from '../assets/logo.png';
 
 
+
+
 const AdminPanel = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [skillFilter, setSkillFilter] = useState('All');
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1); // Track current page
+
+  const rowsPerPage = 10;
   const navigate = useNavigate();
+
+  const indexOfLastRow = currentPage * rowsPerPage;
+  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+
+    const filteredPlayers = players.filter(p => {
+  const matchesSearch = 
+    p.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    p.mobileNumber?.includes(searchTerm) ||
+    p.cricheroesId?.toLowerCase().includes(searchTerm.toLowerCase());
+
+  const skillString = `${p.skills?.batting || 'None'}-${p.skills?.bowling || 'None'}`;
+  
+  // Mapping logic
+  let matchesSkill = true;
+  if (skillFilter !== 'All') {
+    const mapping = {
+      'Right-Right': 'Right Hand-Right Hand',
+      'Right-Left': 'Right Hand-Left Hand',
+      'Left-Left': 'Left Hand-Left Hand',
+      'Left-Right': 'Left Hand-Right Hand'
+    };
+    matchesSkill = skillString === mapping[skillFilter];
+  }
+
+  return matchesSearch && matchesSkill;
+});
+
+  const totalPages = Math.ceil(filteredPlayers.length / rowsPerPage);
+const currentRows = filteredPlayers.slice(indexOfFirstRow, indexOfLastRow);
 
 const exportData = players.map((p, index) => ({
     "S.No": index + 1,
@@ -73,6 +109,8 @@ const exportData = players.map((p, index) => ({
     }
   };
 
+
+
   if (loading) return <FullScreenLoader/>
 
 return (
@@ -96,7 +134,48 @@ return (
 
       {/* 2. MAIN CONTENT AREA */}
       <main className="p-4 md:p-8">
-        <h1 className="text-2xl font-bold mb-6">PLAYER REGISTRATIONS</h1>
+       <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+    
+    {/* Heading */}
+    <h1 className="text-2xl font-bold">PLAYER REGISTRATIONS</h1>
+
+    {/* Filter & Search Container */}
+    <div className="flex gap-4 items-center">
+      {/* Filter Dropdown */}
+      <select 
+        className="p-2 border rounded cursor-pointer"
+        onChange={(e) => { setSkillFilter(e.target.value); setCurrentPage(1); }}
+      >
+        <option value="All">All Skills</option>
+        <option value="Right-Right">Right-Right</option>
+        <option value="Right-Left">Right-Left</option>
+        <option value="Left-Left">Left-Left</option>
+        <option value="Left-Right">Left-Right</option>
+      </select>
+
+      {/* Search Bar */}
+      <div className="flex items-center border rounded overflow-hidden bg-white">
+        <input 
+          type="text"
+          placeholder="Search..."
+          className="p-2 outline-none w-48 md:w-64"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          // If you want the search to trigger on Enter, use the form wrapping trick or onKeyDown
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') setCurrentPage(1);
+          }}
+        />
+        {/* <button 
+          className="p-2 bg-gray-100 hover:bg-gray-200 border-l"
+          onClick={() => setCurrentPage(1)}
+        >
+        
+        </button> */}
+      </div>
+    </div>
+  </div>
+  
         
         <div className="bg-white shadow rounded-xl overflow-x-auto">
           <table className="w-full text-sm text-left">
@@ -112,40 +191,63 @@ return (
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {players.map((p, index) => (
-                <tr key={p._id}>
-                  <td className="px-6 py-4">{index + 1}.</td>
-                  <td className="px-6 py-4">
-                    {p.photo ? (
-                      <img src={p.photo} alt="Player" className="w-12 h-12 object-cover rounded-full border border-gray-300" />
-                    ) : (
-                      <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-[10px]">N/A</div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4">{p.fullName}</td>
-                  <td className="px-6 py-4">{p.mobileNumber}</td>
-                  <td className="px-6 py-4">{p.cricheroesId || 'N/A'}</td>
-                  <td className="px-6 py-4">{p.skills?.batting} / {p.skills?.bowling}</td>
-                  <td className="px-6 py-4 flex items-center space-x-2">
-                    <button 
-                      onClick={() => navigate(`/admin/view/${p._id}`)} 
-                      className="p-2 rounded-md transition-all duration-200 cursor-pointer text-blue-600 hover:bg-blue-600 hover:text-white border border-blue-600"
-                      title="View Details"
-                    >
-                      <FaEye size={18} />
-                    </button>
-                    <button 
-                      onClick={() => deletePlayer(p._id)} 
-                      className="p-2 rounded-md transition-all duration-200 cursor-pointer text-red-600 hover:bg-red-600 hover:text-white border border-red-600"
-                      title="Delete Player"
-                    >
-                      <FaTrash size={18} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+  
+  {currentRows.map((p, index) => (
+    <tr key={p._id}>
+     
+      <td className="px-6 py-4">{indexOfFirstRow + index + 1}.</td>
+      <td className="px-6 py-4">
+        {p.photo ? (
+          <img src={p.photo} alt="Player" className="w-12 h-12 object-cover rounded-full border border-gray-300" />
+        ) : (
+          <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-[10px]">N/A</div>
+        )}
+      </td>
+      <td className="px-6 py-4">{p.fullName}</td>
+      <td className="px-6 py-4">{p.mobileNumber}</td>
+      <td className="px-6 py-4">{p.cricheroesId || 'N/A'}</td>
+      <td className="px-6 py-4">{p.skills?.batting} / {p.skills?.bowling}</td>
+      <td className="px-6 py-4 flex items-center space-x-2">
+        <button 
+          onClick={() => navigate(`/admin/view/${p._id}`)} 
+          className="p-2 rounded-md transition-all duration-200 cursor-pointer text-blue-600 hover:bg-blue-600 hover:text-white border border-blue-600"
+          title="View Details"
+        >
+          <FaEye size={18} />
+        </button>
+        <button 
+          onClick={() => deletePlayer(p._id)} 
+          className="p-2 rounded-md transition-all duration-200 cursor-pointer text-red-600 hover:bg-red-600 hover:text-white border border-red-600"
+          title="Delete Player"
+        >
+          <FaTrash size={18} />
+        </button>
+      </td>
+    </tr>
+  ))}
+</tbody>
           </table>
+
+         {/* 2. PAGINATION CONTROLS */}
+          {players.length > rowsPerPage && (
+            <div className="flex justify-center items-center gap-4 py-6">
+              <button 
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(prev => prev - 1)}
+                className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <span className="font-bold">Page {currentPage} of {totalPages}</span>
+              <button 
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(prev => prev + 1)}
+                className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+          )} 
         </div>
       </main>
     </div>
