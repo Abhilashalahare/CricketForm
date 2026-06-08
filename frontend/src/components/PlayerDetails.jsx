@@ -151,19 +151,19 @@ const PlayerDetails = () => {
 `}</style>
       {/* 1. TOP NAVBAR */}
      <nav className="bg-white shadow-sm px-8 py-4 flex justify-between items-center sticky top-0 z-50">
-  <button onClick={() => navigate('/admin')} className="text-red-900"><FaHome size={24} /></button>
+  <button onClick={() => navigate('/admin')} className="text-red-900 cursor-pointer"><FaHome size={24} /></button>
   
   <div className="flex gap-4">
     {/* PRINT BUTTON */}
     <button 
       onClick={() => window.print()} 
-      className="flex items-center gap-2 bg-gray-800 text-white px-4 py-2 rounded hover:bg-black transition"
+      className="flex items-center gap-2 bg-gray-800 text-white px-4 py-2 rounded hover:bg-black transition cursor-pointer"
     >
       <FaPrint /> PRINT
     </button>
     
     {/* PDF BUTTON */}
-    <button onClick={handleDownloadPDF} className="flex items-center gap-2 bg-red-900 text-white px-4 py-2 rounded hover:bg-black transition">
+    <button onClick={handleDownloadPDF} className="flex items-center gap-2 bg-red-900 text-white px-4 py-2 rounded hover:bg-black transition cursor-pointer">
       <FaFilePdf /> DOWNLOAD PDF
     </button>
   </div>
@@ -171,7 +171,7 @@ const PlayerDetails = () => {
 
       {/* 2. NAVIGATION ARROWS */}
       <div className="flex items-center justify-between max-w-4xl mx-auto mt-8 px-4">
-        <button onClick={() => navigatePlayer('prev')} disabled={currentIndex === 0} className="p-4 bg-white shadow rounded-full hover:bg-gray-200 disabled:opacity-30"><FaArrowLeft /></button>
+        <button onClick={() => navigatePlayer('prev')} disabled={currentIndex === 0} className="p-4 bg-white shadow rounded-full hover:bg-gray-200 disabled:opacity-30 cursor-pointer"><FaArrowLeft /></button>
         
         {/* 3. PROFILE CONTENT CONTAINER */}
         <div id="player-profile" className="bg-white p-10 shadow-lg rounded-xl "  style={{
@@ -194,7 +194,7 @@ const PlayerDetails = () => {
               <div><p className="font-bold text-gray-500">UTR NUMBER</p><p>{player.utrNumber || 'N/A'}</p></div>
               <div>
                 <p className="font-bold text-gray-500">PAYMENT RECEIPT</p>
-                {player.utrReceipt ? <button onClick={() => handleViewReceipt(player.utrReceipt)} className="text-blue-600 underline">View Receipt</button> : 'N/A'}
+                {player.utrReceipt ? <button onClick={() => handleViewReceipt(player.utrReceipt)} className="text-blue-600 underline cursor-pointer">View Receipt</button> : 'N/A'}
               </div>
               <div><p className="font-bold text-gray-500">JERSEY NAME</p><p>{player.jerseyName || 'N/A'}</p></div>
               <div><p className="font-bold text-gray-500">JERSEY NUMBER</p><p>{player.jerseyNumber || 'N/A'}</p></div>
@@ -223,7 +223,7 @@ const PlayerDetails = () => {
           </div>
         </div>
 
-        <button onClick={() => navigatePlayer('next')} disabled={currentIndex === players.length - 1} className="p-4 bg-white shadow rounded-full hover:bg-gray-200 disabled:opacity-30"><FaArrowRight /></button>
+        <button onClick={() => navigatePlayer('next')} disabled={currentIndex === players.length - 1} className="p-4 bg-white shadow rounded-full hover:bg-gray-200 disabled:opacity-30 cursor-pointer"><FaArrowRight /></button>
       </div>
     </div>
   );

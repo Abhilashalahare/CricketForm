@@ -210,7 +210,7 @@ return (
       <td className="px-6 py-4 flex items-center space-x-2">
         <button 
           onClick={() => navigate(`/admin/view/${p._id}`)} 
-          className="p-2 rounded-md transition-all duration-200 cursor-pointer text-blue-600 hover:bg-blue-600 hover:text-white border border-blue-600"
+          className="p-2 rounded-md  transition-all duration-200 cursor-pointer text-blue-600 hover:bg-blue-600 hover:text-white border border-blue-600"
           title="View Details"
         >
           <FaEye size={18} />
