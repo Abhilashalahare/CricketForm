@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import LogoutButton from '../components/LogoutButton';
 import FullScreenLoader from '../components/FullScreenLoader';
-import { FaEye, FaTrash, FaFileExcel } from 'react-icons/fa'; 
+import { FaEye, FaTrash, FaFileExcel, FaUserCircle } from 'react-icons/fa'; 
 import { CSVLink } from 'react-csv';
 import logo from '../assets/logo.png';
 
@@ -17,6 +17,8 @@ const AdminPanel = () => {
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1); // Track current page
+  const [battingFilter, setBattingFilter] = useState('All');
+  const [bowlingFilter, setBowlingFilter] = useState('All');
 
   const rowsPerPage = 10;
   const navigate = useNavigate();
@@ -24,27 +26,21 @@ const AdminPanel = () => {
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
 
-    const filteredPlayers = players.filter(p => {
-  const matchesSearch = 
+   const filteredPlayers = players.filter((p) => {
+  const matchesSearch =
     p.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.mobileNumber?.includes(searchTerm) ||
     p.cricheroesId?.toLowerCase().includes(searchTerm.toLowerCase());
 
-  const skillString = `${p.skills?.batting || 'None'}-${p.skills?.bowling || 'None'}`;
-  
-  // Mapping logic
-  let matchesSkill = true;
-  if (skillFilter !== 'All') {
-    const mapping = {
-      'Right-Right': 'Right Hand-Right Hand',
-      'Right-Left': 'Right Hand-Left Hand',
-      'Left-Left': 'Left Hand-Left Hand',
-      'Left-Right': 'Left Hand-Right Hand'
-    };
-    matchesSkill = skillString === mapping[skillFilter];
-  }
+  const matchesBatting =
+    battingFilter === 'All' ||
+    p.skills?.batting === battingFilter;
 
-  return matchesSearch && matchesSkill;
+  const matchesBowling =
+    bowlingFilter === 'All' ||
+    p.skills?.bowling === bowlingFilter;
+
+  return matchesSearch && matchesBatting && matchesBowling;
 });
 
   const totalPages = Math.ceil(filteredPlayers.length / rowsPerPage);
@@ -88,7 +84,6 @@ const exportData = players.map((p, index) => ({
       });
       setPlayers(response.data);
     } catch (err) {
-      toast.error("Session expired or unauthorized.");
       navigate('/login');
     } finally {
       setLoading(false);
@@ -142,16 +137,31 @@ return (
     {/* Filter & Search Container */}
     <div className="flex gap-4 items-center">
       {/* Filter Dropdown */}
-      <select 
-        className="p-2 border rounded cursor-pointer"
-        onChange={(e) => { setSkillFilter(e.target.value); setCurrentPage(1); }}
-      >
-        <option value="All">All Skills</option>
-        <option value="Right-Right">Right-Right</option>
-        <option value="Right-Left">Right-Left</option>
-        <option value="Left-Left">Left-Left</option>
-        <option value="Left-Right">Left-Right</option>
-      </select>
+      <select
+  value={battingFilter}
+  className="p-2 border rounded cursor-pointer"
+  onChange={(e) => {
+    setBattingFilter(e.target.value);
+    setCurrentPage(1);
+  }}
+>
+  <option value="All">Select Batting</option>
+  <option value="Right Hand">Right Hand</option>
+  <option value="Left Hand">Left Hand</option>
+</select>
+
+      <select
+  value={bowlingFilter}
+  className="p-2 border rounded cursor-pointer"
+  onChange={(e) => {
+    setBowlingFilter(e.target.value);
+    setCurrentPage(1);
+  }}
+>
+  <option value="All">Select Bowling</option>
+  <option value="Right Hand">Right Hand</option>
+  <option value="Left Hand">Left Hand</option>
+</select>
 
       {/* Search Bar */}
       <div className="flex items-center border rounded overflow-hidden bg-white">
@@ -186,7 +196,8 @@ return (
                 <th className="px-6 py-4">Name</th>
                 <th className="px-6 py-4">Phone</th>
                 <th className="px-6 py-4">CricHeroes ID</th>
-                <th className="px-6 py-4">Skills</th>
+                <th className="px-6 py-4">Batting</th>
+                <th className="px-6 py-4">Bowling</th>
                 <th className="px-6 py-4">Actions</th>
               </tr>
             </thead>
@@ -197,16 +208,23 @@ return (
      
       <td className="px-6 py-4">{indexOfFirstRow + index + 1}.</td>
       <td className="px-6 py-4">
-        {p.photo ? (
-          <img src={p.photo} alt="Player" className="w-12 h-12 object-cover rounded-full border border-gray-300" />
-        ) : (
-          <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-[10px]">N/A</div>
-        )}
+       {p.photo ? (
+  <img
+    src={p.photo}
+    alt="Player"
+    className="w-12 h-12 object-cover rounded-full border border-gray-300"
+  />
+) : (
+  <div className="w-12 h-12 flex items-center justify-center">
+    <FaUserCircle className="text-gray-400 text-5xl" />
+  </div>
+)}
       </td>
       <td className="px-6 py-4">{p.fullName}</td>
       <td className="px-6 py-4">{p.mobileNumber}</td>
       <td className="px-6 py-4">{p.cricheroesId || 'N/A'}</td>
-      <td className="px-6 py-4">{p.skills?.batting} / {p.skills?.bowling}</td>
+      <td className="px-6 py-4">{p.skills?.batting}</td>
+      <td className="px-6 py-4">{p.skills?.bowling}</td>
       <td className="px-6 py-4 flex items-center space-x-2">
         <button 
           onClick={() => navigate(`/admin/view/${p._id}`)} 

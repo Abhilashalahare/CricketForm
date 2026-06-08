@@ -3,7 +3,9 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import logo from '../assets/logo.png';
 import { FaUpload } from 'react-icons/fa';
-import bgimage from '../assets/bgimage.jpeg';
+// import bgimage from '../assets/bgimage.jpeg';
+import bgimg1 from '../assets/bgimg1.jpg';
+import bgimg2 from '../assets/bgimg2.jpg';
 
 const initialFormState = {
   fullName: '',
@@ -193,17 +195,17 @@ const RegistrationForm = () => {
   };
 
   return (
-    <div
-      className="min-h-screen flex justify-center items-start"
-      style={{
-        backgroundImage: `url(${bgimage})`,
-        backgroundSize: "contain",
-        backgroundPosition: "center top",
-        backgroundColor: "#f5f5f5",
-
-
-      }}
-    >
+   <div
+  className="min-h-screen flex justify-center items-start"
+  style={{
+    backgroundImage: `url(${bgimg2})`,
+    backgroundRepeat: "repeat",
+    backgroundSize: "160px 106px", // adjust size
+    backgroundPosition: "top left",
+    backgroundColor: "#f5f5f5",
+    // opacity: .5,
+  }}
+>
       <div className="max-w-3xl w-full p-8  bg-white shadow-2xl space-y-8">
         <div className="border-b-4 border-red-900 pb-4">
           <div className="hidden md:flex justify-between items-start">

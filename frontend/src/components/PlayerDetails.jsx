@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import FullScreenLoader from './FullScreenLoader';
 import { FaHome, FaArrowLeft, FaArrowRight, FaFilePdf, FaPrint } from 'react-icons/fa';
 import html2pdf from 'html2pdf.js';
+import profile from '../assets/profile.jpg'
 
 
 
@@ -12,6 +13,7 @@ const PlayerDetails = () => {
   const { id } = useParams();
   const [players, setPlayers] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isNavigating, setIsNavigating] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -63,6 +65,13 @@ const PlayerDetails = () => {
       node.dataset.originalBorder = node.style.borderColor;
       node.style.borderColor = '#cccccc';
     }
+
+    const images = element.querySelectorAll('img');
+
+images.forEach(img => {
+  img.dataset.originalObjectFit = img.style.objectFit;
+  img.style.objectFit = 'contain';
+});
   });
 
   try {
@@ -94,16 +103,35 @@ const PlayerDetails = () => {
       if (node.dataset.originalBorder)
         node.style.borderColor = node.dataset.originalBorder;
     });
+
+    images.forEach(img => {
+  if (img.dataset.originalObjectFit !== undefined) {
+    img.style.objectFit = img.dataset.originalObjectFit;
+  }
+});
   }
 };
 
-  const navigatePlayer = (direction) => {
-    const newIndex = direction === 'next' ? currentIndex + 1 : currentIndex - 1;
-    if (newIndex >= 0 && newIndex < players.length) {
-      navigate(`/admin/view/${players[newIndex]._id}`);
-      setCurrentIndex(newIndex);
-    }
-  };
+const navigatePlayer = (direction) => {
+  if (isNavigating) return;
+
+  setIsNavigating(true);
+
+  const newIndex =
+    direction === "next"
+      ? currentIndex + 1
+      : currentIndex - 1;
+
+  if (newIndex >= 0 && newIndex < players.length) {
+    navigate(`/admin/view/${players[newIndex]._id}`);
+  }
+};
+
+useEffect(() => {
+  if (player) {
+    setIsNavigating(false);
+  }
+}, [player]);
 
   const handleViewReceipt = (base64Data) => {
     if (!base64Data) return;
@@ -142,6 +170,7 @@ const PlayerDetails = () => {
     box-shadow: none !important;
     border-radius: 0 !important;
     background: white !important;
+    
   }
 
   body {
@@ -171,13 +200,36 @@ const PlayerDetails = () => {
 
       {/* 2. NAVIGATION ARROWS */}
       <div className="flex items-center justify-between max-w-4xl mx-auto mt-8 px-4">
-        <button onClick={() => navigatePlayer('prev')} disabled={currentIndex === 0} className="p-4 bg-white shadow rounded-full hover:bg-gray-200 disabled:opacity-30 cursor-pointer"><FaArrowLeft /></button>
+      <button
+  onClick={() => navigatePlayer("prev")}
+  disabled={currentIndex === 0 || isNavigating}
+  className={`
+    p-4 bg-white shadow rounded-full
+    ${
+      !(currentIndex === 0 || isNavigating)
+        ? "hover:bg-gray-200 cursor-pointer"
+        : "cursor-not-allowed opacity-30"
+    }
+  `}
+>
+  <FaArrowLeft />
+</button>
         
         {/* 3. PROFILE CONTENT CONTAINER */}
-        <div id="player-profile" className="bg-white p-10 shadow-lg rounded-xl "  style={{
+        <div id="player-profile" className="bg-white p-10 shadow-lg rounded-xl  relative"  style={{
    maxWidth: "750px",
     width: "100%",
   }}>
+
+     {isNavigating && (
+    <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-50 rounded-xl">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-10 h-10 border-4 border-red-900 border-t-transparent rounded-full animate-spin"></div>
+        {/* <p className="text-gray-600 font-medium">Loading player...</p> */}
+      </div>
+    </div>
+  )}
+
           <h1 className="text-2xl font-black mb-2 text-red-900 border-b pb-4">PLAYER PROFILE</h1>
           
           <div className="flex flex-col md:flex-row gap-8">
@@ -217,13 +269,38 @@ const PlayerDetails = () => {
                 <p className="italic text-lg">{player.signatureName}</p>
               </div>
             </div>
-            <div className="flex-shrink-0">
-              {player.photo && <img src={player.photo} alt="Player" className="w-32 h-40 object-cover border-2 border-red-900" />}
-            </div>
+           <div
+  className="border-2 border-red-900 bg-white flex items-center justify-center"
+  style={{
+    width: "128px",
+    height: "160px",
+    overflow: "hidden"
+  }}
+>
+  <img
+    src={player.photo || profile}
+    alt="Player"
+    style={{
+      width: "100%",
+      height: "100%",
+      objectFit: "cover",
+      display: "block"
+    }}
+  />
+</div>
           </div>
         </div>
 
-        <button onClick={() => navigatePlayer('next')} disabled={currentIndex === players.length - 1} className="p-4 bg-white shadow rounded-full hover:bg-gray-200 disabled:opacity-30 cursor-pointer"><FaArrowRight /></button>
+     <button
+  onClick={() => navigatePlayer("next")}
+  disabled={currentIndex === players.length - 1 || isNavigating}
+  className={`
+    p-4 bg-white shadow rounded-full
+    ${!(currentIndex === players.length - 1 || isNavigating) ? "hover:bg-gray-200 cursor-pointer" : "cursor-not-allowed opacity-30"}
+  `}
+>
+  <FaArrowRight />
+</button>
       </div>
     </div>
   );
