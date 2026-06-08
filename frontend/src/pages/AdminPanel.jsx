@@ -234,7 +234,7 @@ return (
               <button 
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage(prev => prev - 1)}
-                className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+                className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50 cursor-pointer"
               >
                 Previous
               </button>
@@ -242,7 +242,7 @@ return (
               <button 
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage(prev => prev + 1)}
-                className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+                className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50 cursor-pointer"
               >
                 Next
               </button>

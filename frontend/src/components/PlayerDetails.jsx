@@ -115,24 +115,40 @@ const PlayerDetails = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 pb-10">
-      <style>{`
-       @media print {
-  /* Hide navigation, buttons, and the surrounding layout containers */
-  nav, button, .shadow, .bg-white.shadow-lg { 
-    display: none !important; 
+    <style>{`
+@media print {
+
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
   }
-  
-  /* Reset the profile container so it prints on a clean white page */
+
+  body * {
+    visibility: hidden;
+  }
+
+  #player-profile,
+  #player-profile * {
+    visibility: visible;
+  }
+
   #player-profile {
-    display: block !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 180mm !important;
+    margin: 0 auto !important;
+    padding: 8mm !important;
     box-shadow: none !important;
-    width: 100% !important;
-    padding: 0 !important;
-    margin: 0 !important;
+    border-radius: 0 !important;
+    background: white !important;
+  }
+
+  body {
     background: white !important;
   }
 }
-      `}</style>
+`}</style>
       {/* 1. TOP NAVBAR */}
      <nav className="bg-white shadow-sm px-8 py-4 flex justify-between items-center sticky top-0 z-50">
   <button onClick={() => navigate('/admin')} className="text-red-900"><FaHome size={24} /></button>
@@ -159,8 +175,8 @@ const PlayerDetails = () => {
         
         {/* 3. PROFILE CONTENT CONTAINER */}
         <div id="player-profile" className="bg-white p-10 shadow-lg rounded-xl "  style={{
-    width: "800px",
-    minHeight: "auto",
+   maxWidth: "750px",
+    width: "100%",
   }}>
           <h1 className="text-2xl font-black mb-2 text-red-900 border-b pb-4">PLAYER PROFILE</h1>
           
