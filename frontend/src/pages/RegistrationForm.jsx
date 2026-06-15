@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect} from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import logo from '../assets/logo.png';
@@ -43,7 +43,7 @@ const initialFormState = {
   instagramId: '',
   
   // Payment
-  payment: '', 
+  paymentMethod: '', 
   utrReceipt: null, 
   utrReceiptPreview: null,
   
@@ -94,7 +94,7 @@ const RegistrationForm = () => {
     instagramId: '',
 
     // Payment
-    payment: '', 
+    paymentMethod: '', 
     utrReceipt: null, 
     utrReceiptPreview: null,
 
@@ -113,16 +113,23 @@ const RegistrationForm = () => {
   }));
 };
 
-  const handlePhotoChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData(prev => ({
-        ...prev,
-        photo: file, // This stores the File object
-        photoPreview: URL.createObjectURL(file) // This stores the URL for preview
-      }));
-    }
-  };
+
+const handlePhotoChange = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  // 1. Store the actual File object in state (for the FormData later)
+  setFormData(prev => ({ 
+    ...prev, 
+    photo: file 
+  }));
+
+  // 2. Create a temporary URL for the preview (for the <img> tag)
+  setFormData(prev => ({ 
+    ...prev, 
+    photoPreview: URL.createObjectURL(file) 
+  }));
+};
 
   const handleUtrReceiptChange = (e) => {
     const file = e.target.files[0];
@@ -136,115 +143,49 @@ const RegistrationForm = () => {
   };
  
   const today = new Date().toISOString().split('T')[0];
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setSubmitting(true);
+  
+  const form = new FormData();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // 1. Append all flat fields from formData
+  Object.keys(formData).forEach((key) => {
+    if (key !== 'skills' && key !== 'photo' && key !== 'photoPreview' && 
+        key !== 'utrReceipt' && key !== 'utrReceiptPreview') {
+      form.append(key, formData[key]);
+    }
+  });
+
+  // 2. Append nested skills (mapping your state names to schema names)
+  form.append('skills[batting]', formData.battingSkill);
+  form.append('skills[bowlingArm]', formData.bowlingArm);
+  form.append('skills[bowlingPace]', formData.bowlingPace);
+  form.append('skills[fieldingPreference]', formData.fieldingPreference);
+  form.append('skills[fieldingDetails]', formData.fieldingDetails || '');
+
+  // 3. Append the files (using the actual File objects from state)
+  if (formData.photo) form.append('photo', formData.photo);
+  if (formData.utrReceipt) form.append('utrReceipt', formData.utrReceipt);
+
+  try {
+    await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/register`, form, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    toast.success("Registration Successful!");
+    setFormData(initialFormState);
     
-    // console.log("Submit button clicked!");
-    if (submitting) {
-      console.log("Already submitting, blocking extra clicks.");
-      return;} // Prevent double submission
-
-    // ONLY require the receipt if the payment method is UPI
-  if (formData.payment === 'UPI' && !formData.utrReceipt) {
-    toast.error("Please upload your payment receipt for UPI transactions.");
-    return;
+  } catch (error) {
+    const errMsg = error.response?.data?.error || "Registration failed.";
+    toast.error(errMsg);
+  } finally {
+    setSubmitting(false);
   }
-
-    setSubmitting(true);
-
-    const convertToBase64 = (file) => {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = (error) => reject(error);
-      });
-    };
-
-    try {
-      let photoBase64 = null;
-      if (formData.photo) {
-        photoBase64 = await convertToBase64(formData.photo);
-      }
-
-      let utrReceiptBase64 = null;
-      if (formData.utrReceipt) utrReceiptBase64 = await convertToBase64(formData.utrReceipt);
-
-
-
-   const payload = {
-  ...formData,
-  mobileNumber: formData.whatsappNumber,
-  photo: photoBase64,
-  utrReceipt: utrReceiptBase64,
-  dob: formData.dob,
-  gender: formData.gender,
-  city: formData.city,
-  district: formData.district,
-  state: formData.state,
-  pinCode: formData.pinCode,
-  paymentMethod: formData.payment, // Renamed for backend clarity
-
-  // Skills & Game Logic
- skills: {
-  batting: formData.battingSkill,
-  bowlingArm: formData.bowlingArm,
-  bowlingPace: formData.bowlingPace,
-  fieldingPreference: formData.fieldingPreference,
-  fieldingDetails: formData.fieldingDetails // Added this
-},
-
-  aadharNumber: formData.aadharNumber, 
-  
-  // Kit & Legal
-  utrNumber: formData.utrNumber,
-  jerseyName: formData.jerseyName,
-  jerseyNumber: formData.jerseyNumber,
-  jerseySize: formData.jerseySize || 'S',
-  lowerSize: formData.lowerSize,
-  wicketKeeping: formData.wicketKeeping || 'No',
-  
-  submissionDate: formData.submissionDate || new Date().toISOString().split('T')[0],
-  submissionPlace: formData.submissionPlace,
-  signatureName: formData.signatureName,
-  declarationAccepted: formData.declarationAccepted
 };
 
-      const baseUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
-   console.log(payload)
-      await axios.post(`${baseUrl}/api/register`, payload);
-
-      toast.success("Registration Successful!");
-
-      setFormData(initialFormState); // Reset form data to initial state
-       
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-
-      if (receiptInputRef.current) { // Reset receipt input
-        receiptInputRef.current.value = '';
-      }
-
-
-    } catch (err) {
-      console.error("Submission Error Details:", err.response?.data);
-
-      // Check if the backend sent specific validation errors
-      if (err.response?.data?.error) {
-        // This shows the exact message (e.g., "jerseySize is required")
-        toast.error(`Error: ${err.response.data.error}`);
-      } else if (err.response?.data?.details) {
-        // Handle Mongoose validation messages
-        toast.error(`Missing or Invalid Info: ${err.response.data.details}`);
-      } else {
-        toast.error("Registration failed. Please check your internet or contact support.");
-      }
-    } finally {
-      setSubmitting(false);
-    }
-  };
+useEffect(() => {
+  setFormData(prev => ({ ...prev, submissionDate: today }));
+}, [today]);
 
   const inputClass = "w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-red-900 outline-none";
   const labelClass = "block text-sm font-bold text-gray-700 mb-1";
@@ -279,6 +220,8 @@ const RegistrationForm = () => {
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
+                      // Revoke the URL to free memory
+                      if (formData.photoPreview) URL.revokeObjectURL(formData.photoPreview);
                       setFormData(prev => ({ ...prev, photo: null, photoPreview: null }));
                       if (fileInputRef.current) fileInputRef.current.value = "";
                     }}
@@ -648,8 +591,8 @@ const RegistrationForm = () => {
           <div>
             <label className="block text-gray-700 mb-2">Payment Method:<span className="text-red-500">*</span></label>
             <select
-              name="payment"
-              value={formData.payment}
+              name="paymentMethod"
+              value={formData.paymentMethod}
               onChange={handleInputChange}
               className="w-full border border-gray-300 rounded p-2 focus:ring-1 focus:ring-gray-400 outline-none"
               required
@@ -661,7 +604,7 @@ const RegistrationForm = () => {
           </div>
 
          {/* Conditional Receipt Upload Section */}
-{formData.payment === 'UPI' && (
+{formData.paymentMethod === 'UPI' && (
   <div className="mt-4">
     <label className="block text-gray-700 mb-2">
       Upload Payment Receipt:<span className="text-red-500">*</span>

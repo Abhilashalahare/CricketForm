@@ -134,12 +134,11 @@ useEffect(() => {
   }
 }, [player]);
 
-  const handleViewReceipt = (base64Data) => {
-    if (!base64Data) return;
-    const win = window.open();
-    win.document.write(`<iframe src="${base64Data}" style="width:100%; height:100%; border:0;"></iframe>`);
-  };
-
+  const handleViewReceipt = (receiptPath) => {
+  if (!receiptPath) return;
+  const fullUrl = `${import.meta.env.VITE_BACKEND_URL}/${receiptPath}`;
+  window.open(fullUrl, '_blank');
+};
   if (players.length === 0) return <FullScreenLoader />;
 
   return (
@@ -303,15 +302,15 @@ useEffect(() => {
   }}
 >
   <img
-    src={player.photo || profile}
-    alt="Player"
-    style={{
-      width: "100%",
-      height: "100%",
-      objectFit: "cover",
-      display: "block"
-    }}
-  />
+  src={player.photo ? `${import.meta.env.VITE_BACKEND_URL}/${player.photo}` : profile}
+  alt="Player"
+  style={{
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    display: "block"
+  }}
+/>
 </div>
           </div>
         </div>

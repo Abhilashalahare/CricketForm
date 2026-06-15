@@ -6,10 +6,14 @@ import {
   getPlayerById, 
   deletePlayer 
 } from '../controllers/PlayerController.js';
+import Counter from '../models/Counter.js';
+import { upload } from '../middleware/upload.js';
 
 const router = express.Router();
 
-router.post('/register', registerPlayer);
+ const uploadFields = upload.fields([{ name: 'photo', maxCount: 1 }, { name: 'utrReceipt', maxCount: 1 }]);
+
+router.post('/register', uploadFields, registerPlayer);
 router.post('/admin/init-counter', async (req, res) => {
   try {
     const counter = await Counter.findById('playerId');

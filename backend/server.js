@@ -5,11 +5,12 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes.js';
 dotenv.config();
 import Counter from './models/Counter.js';
-
-console.log(process.env.MONGO_URI);
-
-
+import path from 'path';
+import { fileURLToPath } from 'url';
 import playerRoutes from './routes/playerRoutes.js';
+
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 app.use(
@@ -24,25 +25,35 @@ app.use(
 app.use(express.json({ limit: '10mb' })); 
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
+app.use('/uploads', express.static('uploads'));
 
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
+const startServer = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+
     console.log("MongoDB Connected");
-  })
-  .catch((err) => {
-    console.error("MongoDB Connection Error:");
-    console.error(err);
-  });
 
-  const initializeCounter = async () => {
-  const existingCounter = await Counter.findById('playerId');
-  if (!existingCounter) {
-    await Counter.create({ _id: 'playerId', seq: 0 });
-    console.log("Counter initialized.");
+    const existingCounter = await Counter.findById("playerId");
+
+    if (!existingCounter) {
+      await Counter.create({
+        _id: "playerId",
+        seq: 0,
+      });
+
+      console.log("Counter initialized");
+    }
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+
+  } catch (err) {
+    console.error(err);
   }
 };
 
-initializeCounter();
+startServer();
   
 app.use('/api', playerRoutes);
 app.use('/api', authRoutes);

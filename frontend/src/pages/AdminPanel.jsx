@@ -276,15 +276,17 @@ const AdminPanel = () => {
 
                         <td className="px-6 py-4">
                           {p.photo ? (
-                            <img
-                              src={p.photo}
-                              alt="Player"
-                              className="w-12 h-12 rounded-full object-cover border"
-                            />
-                          ) : (
-                            <FaUserCircle className="text-gray-400 text-5xl" />
-                          )}
-                        </td>
+    <img
+      // Concatenate the backend URL with the path stored in the database
+      src={`${import.meta.env.VITE_BACKEND_URL}/${p.photo}`}
+      alt="Player"
+      className="w-12 h-12 rounded-full object-cover border"
+      onError={(e) => { e.target.src = '/default-avatar.png'; }} // Fallback if image fails
+    />
+  ) : (
+    <FaUserCircle className="text-gray-400 text-5xl" />
+  )}
+</td>
 
                         <td className="px-6 py-4 font-medium">
                           {p.fullName}
