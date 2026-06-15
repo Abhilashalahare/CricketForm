@@ -174,7 +174,6 @@ const handleSubmit = async (e) => {
     });
     toast.success("Registration Successful!");
     setFormData(initialFormState);
-    
   } catch (error) {
     const errMsg = error.response?.data?.error || "Registration failed.";
     toast.error(errMsg);

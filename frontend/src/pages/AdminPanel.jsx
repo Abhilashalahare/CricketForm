@@ -13,6 +13,7 @@ import logo from '../assets/logo.png';
 
 import { Search, Download, Filter } from 'lucide-react';
 import LogoutButton from '../components/LogoutButton';
+import defaultAvatar from "../assets/profile.jpg";
 
 
 
@@ -281,7 +282,7 @@ const AdminPanel = () => {
       src={`${import.meta.env.VITE_BACKEND_URL}/${p.photo}`}
       alt="Player"
       className="w-12 h-12 rounded-full object-cover border"
-      onError={(e) => { e.target.src = '/default-avatar.png'; }} // Fallback if image fails
+      onError={(e) => {  e.target.src = defaultAvatar; }} // Fallback if image fails
     />
   ) : (
     <FaUserCircle className="text-gray-400 text-5xl" />
