@@ -6,6 +6,7 @@ import FullScreenLoader from './FullScreenLoader';
 import { FaHome, FaArrowLeft, FaArrowRight, FaFilePdf, FaPrint } from 'react-icons/fa';
 import html2pdf from 'html2pdf.js';
 import profile from '../assets/profile.jpg'
+import jyccLogo from '../assets/jycc-logo.png';
 
 
 
@@ -180,7 +181,7 @@ useEffect(() => {
 `}</style>
       {/* 1. TOP NAVBAR */}
      <nav className="bg-white shadow-sm px-8 py-4 flex justify-between items-center sticky top-0 z-50">
-  <button onClick={() => navigate('/admin')} className="text-red-900 cursor-pointer"><FaHome size={24} /></button>
+  <button onClick={() => navigate('/admin')} className="text-[#0A1F5C] cursor-pointer"><FaHome size={24} /></button>
   
   <div className="flex gap-4">
     {/* PRINT BUTTON */}
@@ -192,7 +193,7 @@ useEffect(() => {
     </button>
     
     {/* PDF BUTTON */}
-    <button onClick={handleDownloadPDF} className="flex items-center gap-2 bg-red-900 text-white px-4 py-2 rounded hover:bg-black transition cursor-pointer">
+    <button onClick={handleDownloadPDF} className="flex items-center gap-2 bg-[#122f81] text-white px-4 py-2 rounded hover:bg-black transition cursor-pointer">
       <FaFilePdf /> DOWNLOAD PDF
     </button>
   </div>
@@ -200,77 +201,101 @@ useEffect(() => {
 
       {/* 2. NAVIGATION ARROWS */}
       <div className="flex items-center justify-between max-w-4xl mx-auto mt-8 px-4">
-      <button
-  onClick={() => navigatePlayer("prev")}
-  disabled={currentIndex === 0 || isNavigating}
+  
+  <button
+  onClick={() => navigatePlayer("next")}
+  disabled={currentIndex === players.length - 1 || isNavigating}
   className={`
     p-4 bg-white shadow rounded-full
-    ${
-      !(currentIndex === 0 || isNavigating)
-        ? "hover:bg-gray-200 cursor-pointer"
-        : "cursor-not-allowed opacity-30"
-    }
+    ${!(currentIndex === players.length - 1 || isNavigating) ? "hover:bg-gray-200 cursor-pointer" : "cursor-not-allowed opacity-30"}
   `}
 >
   <FaArrowLeft />
 </button>
         
         {/* 3. PROFILE CONTENT CONTAINER */}
-        <div id="player-profile" className="bg-white p-10 shadow-lg rounded-xl  relative"  style={{
-   maxWidth: "750px",
-    width: "100%",
-  }}>
+       <div id="player-profile" className="bg-white p-5 shadow-2xl rounded-2xl max-w-3xl w-full">
 
-     {isNavigating && (
-    <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-50 rounded-xl">
-      <div className="flex flex-col items-center gap-3">
-        <div className="w-10 h-10 border-4 border-red-900 border-t-transparent rounded-full animate-spin"></div>
-        {/* <p className="text-gray-600 font-medium">Loading player...</p> */}
-      </div>
+    <div className="flex items-center gap-6 border-b border-slate-700 pb-6 mb-6">
+    {/* Logo */}
+    <div className="w-20 h-20 flex-shrink-0">
+      <img 
+        src={jyccLogo} // Ensure 'logo' is imported at the top of your file
+        alt="Club Logo" 
+        className="w-full h-full object-contain"
+      />
     </div>
-  )}
+    
+    {/* Heading Group */}
+    <div>
+      <h1 className="text-2xl md:text-3xl font-black tracking-tight text-[#0A1F5C]">
+        JAIN YOUTH CRICKET CLUB
+      </h1>
+      <p className="text-[#0A1F5C] font-bold tracking-widest uppercase text-sm mt-1">
+        JYCC 2.0
+      </p>
+    </div>
+  </div>
 
-          <h1 className="text-2xl font-black mb-2 text-red-900 border-b pb-4">PLAYER PROFILE</h1>
+         
           
-          <div className="flex flex-col md:flex-row gap-8">
-            <div className="flex-1 grid grid-cols-2 gap-4 text-sm">
-              <div><p className="font-bold text-gray-500">FULL NAME</p><p>{player.fullName}</p></div>
-              <div><p className="font-bold text-gray-500">PROFESSION</p><p>{player.profession}</p></div>
-              <div><p className="font-bold text-gray-500">MOBILE</p><p>{player.mobileNumber}</p></div>
-              <div><p className="font-bold text-gray-500">WHATSAPP</p><p>{player.whatsappNumber}</p></div>
-              <div><p className="font-bold text-gray-500">EMAIL</p><p>{player.emailId}</p></div>
-              <div><p className="font-bold text-gray-500">AADHAR NUMBER</p><p className="font-mono">{player.aadharNumber}</p></div>
-              <div className="col-span-2"><p className="font-bold text-gray-500">ADDRESS</p><p>{player.residentialAddress}</p></div>
+          <div className="flex flex-col md:flex-row gap-4">
+         
 
-              <div className="col-span-2 border-t pt-2 font-bold text-gray-800">KIT & PAYMENT DETAILS</div>
-              <div><p className="font-bold text-gray-500">UTR NUMBER</p><p>{player.utrNumber || 'N/A'}</p></div>
-              <div>
-                <p className="font-bold text-gray-500">PAYMENT RECEIPT</p>
-                {player.utrReceipt ? <button onClick={() => handleViewReceipt(player.utrReceipt)} className="text-blue-600 underline cursor-pointer">View Receipt</button> : 'N/A'}
-              </div>
-              <div><p className="font-bold text-gray-500">JERSEY NAME</p><p>{player.jerseyName || 'N/A'}</p></div>
-              <div><p className="font-bold text-gray-500">JERSEY NUMBER</p><p>{player.jerseyNumber || 'N/A'}</p></div>
-              <div><p className="font-bold text-gray-500">JERSEY SIZE</p><p>{player.jerseySize || 'N/A'}</p></div>
-              <div><p className="font-bold text-gray-500">LOWER SIZE</p><p>{player.lowerSize || 'N/A'}</p></div>
-              <div><p className="font-bold text-gray-500">WICKET KEEPING</p><p>{player.wicketKeeping}</p></div>
 
-              <div className="col-span-2 border-t pt-2 font-bold text-gray-800">SKILLS & SOCIAL</div>
-              <div><p className="font-bold text-gray-500">BATTING</p><p>{player.skills?.batting}</p></div>
-              <div><p className="font-bold text-gray-500">BOWLING</p><p>{player.skills?.bowling}</p></div>
-              <div className="col-span-2"><p className="font-bold text-gray-500">FIELDING PREFERENCE</p><p>{player.skills?.fieldingPreference || 'N/A'}</p></div>
-              <div><p className="font-bold text-gray-500">CRIC HEROES ID</p><p>{player.cricheroesId || 'N/A'}</p></div>
-              <div><p className="font-bold text-gray-500">INSTAGRAM ID</p><p>{player.instagramId || 'N/A'}</p></div>
+<div className="flex-1 grid grid-cols-3 gap-4 text-sm">
+   
+  <div><p className="font-bold text-gray-500">FULL NAME</p><p>{player.fullName}</p></div>
+  <div>
+  <p className="font-bold text-gray-500">DOB</p>
+  <p>
+    {player.dob 
+      ? new Date(player.dob).toLocaleDateString('en-GB') // 'en-GB' gives you DD/MM/YYYY
+      : 'N/A'
+    }
+  </p>
+</div>
 
-              <div className="col-span-2 border-t"></div>
-              <div><p className="font-bold text-gray-500">SUBMISSION DATE</p><p>{new Date(player.submissionDate).toLocaleDateString()}</p></div>
-              <div><p className="font-bold text-gray-500">PLACE</p><p>{player.submissionPlace || 'N/A'}</p></div>
-              <div className="col-span-2 p-2 bg-gray-50 border-l-4 border-red-900">
-                <p className="font-bold text-gray-500">SIGNATURE NAME</p>
-                <p className="italic text-lg">{player.signatureName}</p>
-              </div>
-            </div>
+  <div><p className="font-bold text-gray-500">GENDER</p><p>{player.gender || 'N/A'}</p></div>
+  <div><p className="font-bold text-gray-500">PROFESSION</p><p>{player.profession}</p></div>
+  <div><p className="font-bold text-gray-500">MOBILE</p><p>{player.whatsappNumber}</p></div>
+  <div><p className="font-bold text-gray-500">EMAIL</p><p>{player.emailId}</p></div>
+  <div><p className="font-bold text-gray-500">AADHAAR NUMBER</p><p className="font-mono">{player.aadharNumber}</p></div>
+  
+  <div className="col-span-3 border-t pt-2 font-bold text-gray-800">LOCATION DETAILS</div>
+  <div><p className="font-bold text-gray-500">DISTRICT</p><p>{player.district || 'N/A'}</p></div>
+  <div><p className="font-bold text-gray-500">STATE</p><p>{player.state || 'N/A'}</p></div>
+  <div><p className="font-bold text-gray-500">PIN CODE</p><p>{player.pinCode || 'N/A'}</p></div>
+  <div><p className="font-bold text-gray-500">ADDRESS</p><p>{player.residentialAddress}</p></div>
+
+  <div className="col-span-3 border-t pt-2 font-bold text-gray-800">KIT & PAYMENT</div>
+  <div><p className="font-bold text-gray-500">PAYMENT METHOD</p><p>{player.paymentMethod || 'N/A'}</p></div>
+  <div>
+    <p className="font-bold text-gray-500">RECEIPT</p>
+    {player.utrReceipt ? <button onClick={() => handleViewReceipt(player.utrReceipt)} className="text-blue-600 underline cursor-pointer">View Receipt</button> : 'N/A'}
+  </div>
+  <div><p className="font-bold text-gray-500">JERSEY NAME</p><p>{player.jerseyName || 'N/A'}</p></div>
+  <div><p className="font-bold text-gray-500">JERSEY NUMBER</p><p>{player.jerseyNumber || 'N/A'}</p></div>
+  <div><p className="font-bold text-gray-500">JERSEY SIZE</p><p>{player.jerseySize || 'N/A'}</p></div>
+  <div><p className="font-bold text-gray-500">LOWER SIZE</p><p>{player.lowerSize || 'N/A'}</p></div>
+
+  <div className="col-span-3 border-t pt-2 font-bold text-gray-800">SKILLS & GAME</div>
+  <div><p className="font-bold text-gray-500">BATTING</p><p>{player.skills?.batting || 'N/A'}</p></div>
+<div><p className="font-bold text-gray-500">BOWLING ARM</p><p>{player.skills?.bowlingArm || 'N/A'}</p></div>
+<div><p className="font-bold text-gray-500">BOWLING PACE</p><p>{player.skills?.bowlingPace || 'N/A'}</p></div>
+<div><p className="font-bold text-gray-500">FIELDING PREF.</p><p>{player.skills?.fieldingPreference || 'N/A'}</p></div>
+<div><p className="font-bold text-gray-500">SPECIFY PREF.</p><p>{player.skills?.fieldingDetails || 'N/A'}</p></div>
+  <div><p className="font-bold text-gray-500">CRICHEROES ID</p><p>{player.cricheroesId || 'N/A'}</p></div>
+  <div><p className="font-bold text-gray-500">INSTAGRAM ID</p><p>{player.instagramId || 'N/A'}</p></div>
+
+  <div className="col-span-3 border-t pt-2 font-bold text-gray-800">SUBMISSION</div>
+  <div><p className="font-bold text-gray-500">SIGNATURE</p><p>{player.signatureName || 'N/A'}</p></div>
+  <div><p className="font-bold text-gray-500">DATE</p><p>{player.submissionDate ? new Date(player.submissionDate).toLocaleDateString() : 'N/A'}</p></div>
+  <div><p className="font-bold text-gray-500">PLACE</p><p>{player.submissionPlace || 'N/A'}</p></div>
+
+</div>
            <div
-  className="border-2 border-red-900 bg-white flex items-center justify-center"
+  className="border-2 border-[#0A1F5C] bg-white flex items-center justify-center"
   style={{
     width: "128px",
     height: "160px",
@@ -291,12 +316,16 @@ useEffect(() => {
           </div>
         </div>
 
-     <button
-  onClick={() => navigatePlayer("next")}
-  disabled={currentIndex === players.length - 1 || isNavigating}
+       <button
+  onClick={() => navigatePlayer("prev")}
+  disabled={currentIndex === 0|| isNavigating}
   className={`
     p-4 bg-white shadow rounded-full
-    ${!(currentIndex === players.length - 1 || isNavigating) ? "hover:bg-gray-200 cursor-pointer" : "cursor-not-allowed opacity-30"}
+    ${
+      !(currentIndex === 0 || isNavigating)
+        ? "hover:bg-gray-200 cursor-pointer"
+        : "cursor-not-allowed opacity-30"
+    }
   `}
 >
   <FaArrowRight />

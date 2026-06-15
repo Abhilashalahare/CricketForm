@@ -1,58 +1,75 @@
 import mongoose from 'mongoose';
 
 const PlayerSchema = new mongoose.Schema({
+  // Personal Details
+  serialNumber: { type: String, unique: true },
   fullName: { type: String, required: true, trim: true },
+  dob: { type: Date, required: true },
+  gender: { type: String, enum: ['Male', 'Female'], required: true },
   profession: { 
     type: String, 
     enum: ['Business', 'Salaried', 'Self Employed'], 
-    required: true // Added required
+    required: true 
   },
-  photo: { type: String }, 
-  mobileNumber: { 
+  photo: { type: String, required: true },
+
+  whatsappNumber: { 
     type: String, 
-    required: true, 
+    required: true,
     unique: true,
     validate: {
       validator: (v) => /^\d{10}$/.test(v),
-      message: "Mobile number must be exactly 10 digits."
-    }
-  },
-  whatsappNumber: { 
-    type: String,
-    // Allow empty string to pass validation, otherwise must be 10 digits
-    validate: {
-      validator: (v) => !v || /^\d{10}$/.test(v),
       message: "WhatsApp number must be exactly 10 digits."
     }
+    
   },
-  emailId: { type: String, required: true, unique: true, lowercase: true, trim: true },
-  residentialAddress: { type: String },
+  emailId: { type: String, required: true, lowercase: true, trim: true, unique: true, },
+  residentialAddress: { type: String, required: true },
+  
+  district: { type: String, required: true },
+  state: { type: String, required: true },
+  pinCode: { type: String, required: true },
+  
+  // Aadhaar: Note that storage should be handled with extreme care and encryption
   aadharNumber: { 
     type: String, 
     required: true, 
     unique: true,
     validate: {
       validator: (v) => /^\d{12}$/.test(v),
-      message: "[Aadhaar Redacted] must be exactly 12 digits long."
+      message: "Aadhar must be exactly 12 digits long."
     }
   },
-  utrNumber: { type: String, unique: true, required: true },
-  utrReceipt: { type: String, required: true },
-  jerseyName: { type: String, required: true, trim: true },
-  jerseyNumber: { type: String, required: true },
-  jerseySize: { type: String, required: true },
-  lowerSize: { type: String, required: true },
-  wicketKeeping: { type: String, enum: ['Yes', 'No'], default: 'No' }, // Added enum
 
+  // Kit Details
+  jerseyName: { type: String, trim: true },
+  jerseyNumber: { type: String },
+  jerseySize: { type: String, enum: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'XXXXL'] },
+  lowerSize: { type: String },
+
+
+  wicketKeeping: { type: String, enum: ['Yes', 'No'], default: 'No' },
+
+  // Skills & Game
   skills: {
-    batting: { type: String, enum: ['Right Hand', 'Left Hand', 'None'], default: 'None' },
-    bowling: { type: String, enum: ['Right Hand', 'Left Hand', 'None'], default: 'None' },
-    fieldingPreference: { type: String }
+    batting: { type: String, enum: ['Right Hand', 'Left Hand'], required: true },
+    bowlingArm: { type: String, enum: ['Right Hand', 'Left Hand'], required: true },
+    bowlingPace: { type: String, enum: ['Med Pace', 'Off Spinner', 'Leg Spinner'], required: true },
+    fieldingPreference: { type: String, enum: ['Yes', 'No'], required: true },
+    fieldingDetails: { type: String } // Stores the "Specify Preference" text
   },
 
-  cricheroesId: { type: String },
+  // Social & Profiles
+  cricheroesId: { type: String, required: true, unique: true
+   },
   instagramId: { type: String },
 
+  // Payment
+  paymentMethod: { type: String, enum: ['UPI', 'Cash'], required: true },
+ 
+  utrReceipt: { type: String }, 
+
+  // Declaration
   declarationAccepted: { type: Boolean, required: true },
   signatureName: { type: String, required: true, trim: true },
   submissionDate: { type: Date, required: true },

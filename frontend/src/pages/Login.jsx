@@ -26,12 +26,12 @@ const Login = () => {
 
  return (
     <div className="flex justify-center items-center h-screen bg-gray-50 px-4">
-      <form onSubmit={handleLogin} className="bg-white p-8 shadow-xl rounded-lg w-full max-w-sm border-t-4 border-red-900">
-        <h2 className="text-2xl font-black mb-6 text-red-900 text-center">ADMIN ACCESS</h2>
+      <form onSubmit={handleLogin} className="bg-white p-8 shadow-xl rounded-lg w-full max-w-sm border-t-4 border-[#0A1F5C]">
+        <h2 className="text-2xl font-black mb-6 text-[#0A1F5C] text-center">ADMIN ACCESS</h2>
         
         <div className="space-y-4">
           <input 
-            className="w-full border-b border-gray-300 p-2 focus:border-red-900 outline-none" 
+            className="w-full border-b border-gray-300 p-2 focus:border-[#0A1F5C] outline-none" 
             placeholder="Username" 
             onChange={e => setCreds({...creds, username: e.target.value})} 
             required
@@ -56,7 +56,7 @@ const Login = () => {
           </div>
         </div>
         
-        <button className="w-full bg-red-900 text-white py-3 mt-8 font-bold cursor-pointer hover:bg-black transition-all">
+        <button className="w-full bg-gradient-to-r from-[#020617] via-[#0A1F5C] to-[#1E3A8A]  text-white py-3 mt-8 font-bold cursor-pointer hover:bg-black transition-all">
           SIGN IN
         </button>
       </form>

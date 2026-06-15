@@ -1,12 +1,28 @@
 import Player from '../models/Player.js';
+import Counter from '../models/Counter.js';
 
 // REGISTER PLAYER
 export const registerPlayer = async (req, res) => {
-  try {
-    const newPlayer = new Player(req.body);
+ try {
+    // 1. Find and increment the counter
+    const counter = await Counter.findByIdAndUpdate(
+      { _id: 'playerId' },
+      { $inc: { seq: 1 } },
+      { new: true, upsert: true }
+    );
+
+    // 2. Format the serial number (e.g., JYCC-001)
+    const formattedSerial = `JYCC-${counter.seq.toString().padStart(3, '0')}`;
+
+    // 3. Save player with the serial number
+    const newPlayer = new Player({
+      ...req.body,
+      serialNumber: formattedSerial
+    });
+    
     await newPlayer.save();
-    res.status(201).json({ message: "Registration Successful" });
-  } catch (error) {
+    res.status(201).json({ message: "Registration Successful", serial: formattedSerial });
+  }catch (error) {
     console.error("Backend Validation Error:", error);
 
     // Handle Mongoose Validation Errors
@@ -15,15 +31,24 @@ export const registerPlayer = async (req, res) => {
       return res.status(400).json({ error: messages[0] });
     }
 
-    // Handle Duplicate Key Errors (Unique constraint)
+    // UPDATED: Handle Duplicate Key Errors (Unique constraint)
     if (error.code === 11000) {
-      return res.status(400).json({ error: "Duplicate field value entered." });
+      // Get the name of the field that caused the conflict
+      const field = Object.keys(error.keyValue)[0];
+      
+      // Format the field name (e.g., 'aadharNumber' -> 'Aadhaar Number')
+      const formattedField = field
+        .replace(/([A-Z])/g, ' $1') // Add space before capitals
+        .replace(/^./, str => str.toUpperCase()); // Capitalize first letter
+
+      return res.status(400).json({ 
+        error: `${formattedField} is already registered.` 
+      });
     }
 
     res.status(500).json({ error: "Internal Server Error", details: error.message });
   }
 };
-
 // GET ALL PLAYERS
 export const getAllPlayers = async (req, res) => {
   try {

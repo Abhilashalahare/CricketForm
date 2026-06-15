@@ -4,6 +4,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes.js';
 dotenv.config();
+import Counter from './models/Counter.js';
 
 console.log(process.env.MONGO_URI);
 
@@ -32,6 +33,16 @@ mongoose.connect(process.env.MONGO_URI)
     console.error("MongoDB Connection Error:");
     console.error(err);
   });
+
+  const initializeCounter = async () => {
+  const existingCounter = await Counter.findById('playerId');
+  if (!existingCounter) {
+    await Counter.create({ _id: 'playerId', seq: 0 });
+    console.log("Counter initialized.");
+  }
+};
+
+initializeCounter();
   
 app.use('/api', playerRoutes);
 app.use('/api', authRoutes);

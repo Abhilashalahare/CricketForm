@@ -10,6 +10,18 @@ import {
 const router = express.Router();
 
 router.post('/register', registerPlayer);
+router.post('/admin/init-counter', async (req, res) => {
+  try {
+    const counter = await Counter.findById('playerId');
+    if (!counter) {
+      await Counter.create({ _id: 'playerId', seq: 0 });
+      return res.status(200).json({ message: "Counter initialized to 0" });
+    }
+    res.status(200).json({ message: "Counter already exists" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to initialize" });
+  }
+});
 router.get('/admin/players', verifyToken, getAllPlayers);
 router.get('/admin/players/:id', verifyToken, getPlayerById);
 router.delete('/admin/players/:id', verifyToken, deletePlayer);
