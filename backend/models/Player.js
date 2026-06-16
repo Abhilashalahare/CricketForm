@@ -13,15 +13,15 @@ const PlayerSchema = new mongoose.Schema({
   },
   photo: { type: String, required: true },
 
-  whatsappNumber: { 
-    type: String, 
+whatsappNumber: {
+    type: String,
     required: true,
     unique: true,
     validate: {
-      validator: (v) => /^\d{10}$/.test(v),
+      validator: (v) => /^91\d{10}$/.test(v),
       message: "WhatsApp number must be exactly 10 digits."
     }
-    
+
   },
   emailId: { type: String, required: true, lowercase: true, trim: true, unique: true, },
   residentialAddress: { type: String, required: true },

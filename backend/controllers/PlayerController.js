@@ -1,12 +1,27 @@
 import Player from '../models/Player.js';
 import Counter from '../models/Counter.js';
+import {sendWhatsAppMessage} from '../services/whatsappService.js'
 
 // REGISTER PLAYER
 export const registerPlayer = async (req, res) => {
+  const whatsappNumber = req.body.whatsappNumber.startsWith("91")
+    ? req.body.whatsappNumber
+    : `91${req.body.whatsappNumber}`;
   try {
     // 1. Validate that files were uploaded by the middleware
-    if (!req.files || !req.files['photo'] || !req.files['utrReceipt']) {
-      return res.status(400).json({ error: "Please upload both profile photo and payment receipt." });
+    if (!req.files || !req.files['photo']) {
+      return res.status(400).json({
+        error: "Please upload profile photo."
+      });
+    }
+
+    if (
+      req.body.paymentMethod === "UPI" &&
+      (!req.files['utrReceipt'] || req.files['utrReceipt'].length === 0)
+    ) {
+      return res.status(400).json({
+        error: "Please upload payment receipt for UPI payment."
+      });
     }
 
     // 2. Find and increment the serial number counter
@@ -20,25 +35,39 @@ export const registerPlayer = async (req, res) => {
 
     // 3. Extract file paths from Multer
     const photoPath = req.files['photo'][0].path;
-    const receiptPath = req.files['utrReceipt'][0].path;
+    // const receiptPath = req.files['utrReceipt'][0].path;
+    const receiptPath = req.files['utrReceipt']
+      ? req.files['utrReceipt'][0].path
+      : null;
 
     // 4. Create new player instance
     // We spread req.body to get all text fields, then override files and serial
     const newPlayer = new Player({
       ...req.body,
+      whatsappNumber,
       submissionDate: req.body.submissionDate || new Date(),
       photo: photoPath,
       utrReceipt: receiptPath,
       serialNumber: formattedSerial,
       // Note: Ensure your Aadhaar number is treated as a string, not a number
-      aadharNumber: req.body.aadharNumber 
+      aadharNumber: req.body.aadharNumber
     });
-    
+
     await newPlayer.save();
-    
-    res.status(201).json({ 
-      message: "Registration Successful", 
-      serial: formattedSerial 
+
+    // Background me WhatsApp bhejo
+    sendWhatsAppMessage(
+      newPlayer.whatsappNumber,
+      newPlayer.fullName,
+      formattedSerial
+    ).catch(err => {
+      console.error("WhatsApp Error:", err.message);
+    });
+
+    // User ko turant response
+    res.status(201).json({
+      message: "Registration Successful",
+      serial: formattedSerial
     });
 
   } catch (error) {
@@ -57,8 +86,8 @@ export const registerPlayer = async (req, res) => {
         .replace(/([A-Z])/g, ' $1')
         .replace(/^./, str => str.toUpperCase());
 
-      return res.status(400).json({ 
-        error: `${formattedField === 'Aadhar Number' ? '[Aadhaar Redacted]' : formattedField} is already registered.` 
+      return res.status(400).json({
+        error: `${formattedField === 'Aadhar Number' ? '[Aadhaar Redacted]' : formattedField} is already registered.`
       });
     }
 
