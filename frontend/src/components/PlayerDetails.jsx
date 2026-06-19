@@ -243,15 +243,15 @@ useEffect(() => {
 
 
 <div className="flex-1 grid grid-cols-3 gap-4 text-sm">
-   
+   <div>
+  <p className="font-bold text-gray-500">REGISTRATION NO.</p>
+  <p>{player.serialNumber}</p>
+</div>
   <div><p className="font-bold text-gray-500">FULL NAME</p><p>{player.fullName}</p></div>
   <div>
   <p className="font-bold text-gray-500">DOB</p>
   <p>
-    {player.dob 
-      ? new Date(player.dob).toLocaleDateString('en-GB') // 'en-GB' gives you DD/MM/YYYY
-      : 'N/A'
-    }
+  <p>{player.dob || 'N/A'}</p>
   </p>
 </div>
 
@@ -279,11 +279,29 @@ useEffect(() => {
   <div><p className="font-bold text-gray-500">LOWER SIZE</p><p>{player.lowerSize || 'N/A'}</p></div>
 
   <div className="col-span-3 border-t pt-2 font-bold text-gray-800">SKILLS & GAME</div>
-  <div><p className="font-bold text-gray-500">BATTING</p><p>{player.skills?.batting || 'N/A'}</p></div>
-<div><p className="font-bold text-gray-500">BOWLING ARM</p><p>{player.skills?.bowlingArm || 'N/A'}</p></div>
-<div><p className="font-bold text-gray-500">BOWLING PACE</p><p>{player.skills?.bowlingPace || 'N/A'}</p></div>
-<div><p className="font-bold text-gray-500">FIELDING PREF.</p><p>{player.skills?.fieldingPreference || 'N/A'}</p></div>
-<div><p className="font-bold text-gray-500">SPECIFY PREF.</p><p>{player.skills?.fieldingDetails || 'N/A'}</p></div>
+  <div>
+  <p className="font-bold text-gray-500">BATTING</p>
+  <p>{player.skills?.batting || "N/A"}</p>
+</div>
+
+<div>
+  <p className="font-bold text-gray-500">BOWLING</p>
+  <p>{player.skills?.bowling || "N/A"}</p>
+</div>
+
+<div className="col-span-2">
+  <p className="font-bold text-gray-500">ALL ROUNDER SKILLS</p>
+  <p>
+    {Array.isArray(player.skills?.allRounder)
+      ? player.skills.allRounder.join(", ")
+      : "N/A"}
+  </p>
+</div>
+
+<div>
+  <p className="font-bold text-gray-500">WICKET KEEPER</p>
+  <p>{player.wicketKeeping || "N/A"}</p>
+</div>
   <div><p className="font-bold text-gray-500">CRICHEROES ID</p><p>{player.cricheroesId || 'N/A'}</p></div>
   <div><p className="font-bold text-gray-500">INSTAGRAM ID</p><p>{player.instagramId || 'N/A'}</p></div>
 

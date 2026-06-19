@@ -4,7 +4,7 @@ const PlayerSchema = new mongoose.Schema({
   // Personal Details
   serialNumber: { type: String, unique: true },
   fullName: { type: String, required: true, trim: true },
-  dob: { type: Date, required: true },
+  dob: { type: String, required: true },
   gender: { type: String, enum: ['Male', 'Female'], required: true },
   profession: { 
     type: String, 
@@ -51,16 +51,31 @@ whatsappNumber: {
   wicketKeeping: { type: String, enum: ['Yes', 'No'], default: 'No' },
 
   // Skills & Game
-  skills: {
-    batting: { type: String, enum: ['Right Hand', 'Left Hand'], required: true },
-    bowlingArm: { type: String, enum: ['Right Hand', 'Left Hand'], required: true },
-    bowlingPace: { type: String, enum: ['Med Pace', 'Off Spinner', 'Leg Spinner'], required: true },
-    fieldingPreference: { type: String, enum: ['Yes', 'No'], required: true },
-    fieldingDetails: { type: String } // Stores the "Specify Preference" text
+ skills: {
+  batting: {
+    type: String,
+    enum: ['Right Hand', 'Left Hand'],
+    default: ''
   },
 
+  bowling: {
+    type: String,
+    enum: [
+      'Right Hand Fast',
+      'Left Hand Fast',
+      'Right Hand Spinner',
+      'Left Hand Spinner'
+    ],
+    default: ''
+  },
+
+  allRounder: {
+    type: [String],
+    default: []
+  }
+},
   // Social & Profiles
-  cricheroesId: { type: String, required: true, unique: true
+  cricheroesId: { type: String, 
    },
   instagramId: { type: String },
 

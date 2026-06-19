@@ -8,6 +8,7 @@ import bgimg1 from '../assets/bgimg1.jpg';
 import bgimg2 from '../assets/bgimg2.jpg';
 import Navbar from '../components/Navbar';
 
+
 const initialFormState = {
   // Personal Details
   fullName: '',
@@ -32,11 +33,13 @@ const initialFormState = {
   lowerSize: '',
   
   // About Your Game
-  bowlingArm: '', 
-  bowlingPace: '', 
-  wicketKeeping: '', 
-  battingSkill: '', 
-  fieldingPreference: '',
+ playerType: '',
+ hasBatting: '',
+  hasBowling: '',           
+  battingSkill: '',          
+  bowlingSkill: '',        
+  allRounderSkills: [],    
+  wicketKeeping: '',
   
   // Digital/Social
   cricheroesId: '', 
@@ -57,6 +60,7 @@ const initialFormState = {
 const RegistrationForm = () => {
   const fileInputRef = useRef(null);
   const receiptInputRef = useRef(null);
+  const cameraInputRef = useRef(null);
 
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -83,11 +87,15 @@ const RegistrationForm = () => {
     lowerSize: '',
 
     // About Your Game
-    bowlingArm: '', 
-    bowlingPace: '', 
+    playerType: '', // Tracks: 'Batting', 'Bowling', or 'All Rounder'
+
+   hasBatting: '',
+    hasBowling: '',
+    battingSkill: '',             // For standard Batting selection
+    bowlingSkill: '',             // For standard Bowling selection
+    allRounderSkills: [],         // Array to hold multiple selections for All Rounder
     wicketKeeping: '', 
-    battingSkill: '', 
-    fieldingPreference: '',
+   
 
     // Digital/Social
     cricheroesId: '', 
@@ -105,12 +113,44 @@ const RegistrationForm = () => {
     submissionPlace: ''
   });
 
-  const handleInputChange = (e) => {
+const handleInputChange = (e) => {
   const { name, value, type, checked } = e.target;
-  setFormData(prev => ({
-    ...prev,
-    [name]: type === 'checkbox' ? checked : value
-  }));
+
+  setFormData((prev) => {
+    // 1. Handle Multi-select Checkboxes (For All-Rounder Skills)
+    if (name === 'allRounderSkills') {
+      const currentSkills = prev.allRounderSkills || [];
+      const updatedSkills = checked 
+        ? [...currentSkills, value] 
+        : currentSkills.filter(s => s !== value);
+      return { ...prev, allRounderSkills: updatedSkills };
+    }
+
+    // 2. Handle Radio Buttons
+    if (type === 'radio') {
+      // If clicking the currently active one, reset it (Toggle off)
+      if (prev[name] === value) {
+        return { ...prev, [name]: '' };
+      }
+      
+      // If switching to a new radio button, clear all other skill fields 
+      // to ensure clean data for your Admin Panel
+      return { 
+        ...prev, 
+        [name]: value,
+        // Optional: clear other skill fields when switching modes
+        battingSkill: name === 'playerType' && value !== 'Batting' ? '' : prev.battingSkill,
+        bowlingSkill: name === 'playerType' && value !== 'Bowling' ? '' : prev.bowlingSkill,
+        allRounderSkills: name === 'playerType' && value !== 'All Rounder' ? [] : prev.allRounderSkills
+      };
+    }
+
+    // 3. Standard Field Update
+    return {
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    };
+  });
 };
 
 
@@ -147,6 +187,17 @@ const handleSubmit = async (e) => {
   e.preventDefault();
   setSubmitting(true);
   
+  const dobRegex =
+    /^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-\d{4}$/;
+
+  if (!dobRegex.test(formData.dob)) {
+    toast.error("Please enter a valid date in DD-MM-YYYY format");
+    setSubmitting(false);
+    return;
+  }
+
+
+  
   const form = new FormData();
 
   // 1. Append all flat fields from formData
@@ -157,12 +208,9 @@ const handleSubmit = async (e) => {
     }
   });
 
-  // 2. Append nested skills (mapping your state names to schema names)
   form.append('skills[batting]', formData.battingSkill);
-  form.append('skills[bowlingArm]', formData.bowlingArm);
-  form.append('skills[bowlingPace]', formData.bowlingPace);
-  form.append('skills[fieldingPreference]', formData.fieldingPreference);
-  form.append('skills[fieldingDetails]', formData.fieldingDetails || '');
+form.append('skills[bowling]', formData.bowlingSkill);
+form.append('skills[allRounder]', JSON.stringify(formData.allRounderSkills));
 
   // 3. Append the files (using the actual File objects from state)
   if (formData.photo) form.append('photo', formData.photo);
@@ -182,13 +230,13 @@ const handleSubmit = async (e) => {
   }
 };
 
+
+
 useEffect(() => {
   setFormData(prev => ({ ...prev, submissionDate: today }));
 }, [today]);
 
-  const inputClass = "w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-red-900 outline-none";
-  const labelClass = "block text-sm font-bold text-gray-700 mb-1";
-  const sectionHeaderClass = "text-xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2 mb-6 mt-8";
+  
 
   return (
     <div className="min-h-screen bg-white text-gray-900 font-sans">
@@ -249,23 +297,45 @@ useEffect(() => {
             <input name="fullName" value={formData.fullName} onChange={handleInputChange} className="w-full border border-gray-300 rounded p-2 focus:ring-1 focus:ring-gray-400 outline-none" placeholder="Enter Player's Name" required />
           </div>
 
-          {/* Date of Birth */}
-         <div>
+         
+   {/* Date of Birth */}
+<div>
   <label className="block text-gray-700 mb-2 font-bold">
-    Date Of Birth:<span className="text-red-500">*</span>
+    Date Of Birth (DD-MM-YYYY):<span className="text-red-500">*</span>
   </label>
-  <input 
-    type="date" 
-    name="dob" 
-    // This value must be YYYY-MM-DD or empty string
-    value={formData.dob} 
-    // max="today" prevents picking future dates
-    max={today}
-    onChange={handleInputChange} 
-    className="w-full border border-gray-300 rounded p-2 focus:ring-1 focus:ring-red-900 outline-none" 
-    required 
+
+  <input
+    type="text"
+    name="dob"
+    value={formData.dob}
+    onChange={(e) => {
+      let value = e.target.value.replace(/\D/g, "");
+
+      if (value.length > 2) {
+        value = value.slice(0, 2) + "-" + value.slice(2);
+      }
+
+      if (value.length > 5) {
+        value = value.slice(0, 5) + "-" + value.slice(5);
+      }
+
+      if (value.length > 10) {
+        value = value.slice(0, 10);
+      }
+
+      handleInputChange({
+        target: {
+          name: "dob",
+          value,
+        },
+      });
+    }}
+    placeholder="DD-MM-YYYY"
+    maxLength={10}
+    className="w-full border border-gray-300 rounded p-2 focus:ring-1 focus:ring-gray-400 outline-none"
+    required
   />
-  </div>
+</div>
 
           {/* Image Upload Section */}
           <div className="md:row-span-2 flex flex-col items-center justify-center hidden md:block">
@@ -366,6 +436,7 @@ useEffect(() => {
                 inputMode="numeric"
                 pattern="\d{12}"
                 maxLength="12"
+                title="Aadhaar must be 12 digits"
                 onChange={(e) => {
                   const value = e.target.value.replace(/\D/g, "");
                   handleInputChange({ target: { name: 'aadharNumber', value } });
@@ -485,28 +556,159 @@ useEffect(() => {
   
   <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6">
     
-    {/* Bowling Arm */}
-    <div>
-      <label className="block text-gray-700 mb-2">Bowling Arm:<span className="text-red-500">*</span></label>
-      <select name="bowlingArm" value={formData.bowlingArm} onChange={handleInputChange} className="w-full border border-gray-300 rounded p-2 focus:ring-1 focus:ring-gray-400 outline-none" required>
-        <option value="">Select Bowling Arm</option>
+
+{/* Batting Section */}
+<div className="mb-4">
+  <label className="flex items-center gap-1 cursor-pointer text-gray-700">
+    <input
+      type="checkbox"
+      checked={formData.hasBatting === "Yes"}
+      onChange={(e) =>
+        handleInputChange({
+          target: {
+            name: "hasBatting",
+            value: e.target.checked ? "Yes" : "No",
+          },
+        })
+      }
+      className="w-4 h-4"
+    />
+    Batting
+  </label>
+
+  {formData.hasBatting === "Yes" && (
+    <div className="mt-2">
+      <select
+        name="battingSkill"
+        value={formData.battingSkill}
+        onChange={handleInputChange}
+        className="w-full border border-gray-300 rounded p-2 focus:ring-1 focus:ring-gray-400 outline-none"
+      
+      >
+        <option value="">Select Hand</option>
         <option value="Right Hand">Right Hand</option>
         <option value="Left Hand">Left Hand</option>
       </select>
     </div>
+  )}
+</div>
 
-    {/* Bowling Pace */}
-    <div>
-      <label className="block text-gray-700 mb-2">Bowling Pace:<span className="text-red-500">*</span></label>
-      <select name="bowlingPace" value={formData.bowlingPace} onChange={handleInputChange} className="w-full border border-gray-300 rounded p-2 focus:ring-1 focus:ring-gray-400 outline-none" required>
-        <option value="">Select Pace</option>
-        <option value="Med Pace">Med Pace</option>
-        <option value="Off Spinner">Off Spinner</option>
-        <option value="Leg Spinner">Leg Spinner</option>
+{/* Bowling Section */}
+<div className="mb-4">
+  <label className="flex items-center cursor-pointer gap-1 text-gray-700">
+    <input
+      type="checkbox"
+      checked={formData.hasBowling === "Yes"}
+      onChange={(e) =>
+        handleInputChange({
+          target: {
+            name: "hasBowling",
+            value: e.target.checked ? "Yes" : "No",
+          },
+        })
+      }
+      className="w-4 h-4"
+    />
+    Bowling
+  </label>
+
+  {formData.hasBowling === "Yes" && (
+    <div className="mt-2">
+      <select
+        name="bowlingSkill"
+        value={formData.bowlingSkill}
+        onChange={handleInputChange}
+        className="w-full border border-gray-300 rounded p-2 focus:ring-1 focus:ring-gray-400 outline-none"
+        
+      >
+        <option value="">Select Bowling Type</option>
+        <option value="Right Hand Fast">Right Hand Fast</option>
+        <option value="Left Hand Fast">Left Hand Fast</option>
+        <option value="Right Hand Spinner">Right Hand Spinner</option>
+        <option value="Left Hand Spinner">Left Hand Spinner</option>
       </select>
     </div>
+  )}
+</div>
 
-    {/* Wicket Keeper */}
+{/* All Rounder Section */}
+<div className="mb-4">
+  <label className="flex items-center gap-1 cursor-pointer text-gray-700">
+    <input
+      type="checkbox"
+      checked={formData.playerType === "All Rounder"}
+      onChange={(e) =>
+        handleInputChange({
+          target: {
+            name: "playerType",
+            value: e.target.checked ? "All Rounder" : "",
+          },
+        })
+      }
+      className="w-4 h-4"
+    />
+    All Rounder
+  </label>
+
+  {formData.playerType === "All Rounder" && (
+    <div className="mt-3 p-4 border border-gray-300 rounded-lg">
+      <p className="font-semibold mb-3">Select Your Skills</p>
+
+      {/* Batting Skills */}
+      <div className="mb-4">
+        <h4 className="font-bold text-gray-700 mb-2">Batting</h4>
+
+        {["Right Hand", "Left Hand"].map((skill) => (
+          <label
+            key={skill}
+            className="flex items-center gap-2 mb-1 cursor-pointer"
+          >
+            <input
+              type="checkbox"
+              name="allRounderSkills"
+              value={skill}
+              checked={
+                formData.allRounderSkills?.includes(skill) || false
+              }
+              onChange={handleInputChange}
+            />
+            {skill}
+          </label>
+        ))}
+      </div>
+
+      {/* Bowling Skills */}
+      <div>
+        <h4 className="font-bold text-gray-700 mb-2">Bowling</h4>
+
+        {[
+          "Right Hand Fast",
+          "Left Hand Fast",
+          "Right Hand Spinner",
+          "Left Hand Spinner",
+        ].map((skill) => (
+          <label
+            key={skill}
+            className="flex items-center gap-2 mb-1 cursor-pointer"
+          >
+            <input
+              type="checkbox"
+              name="allRounderSkills"
+              value={skill}
+              checked={
+                formData.allRounderSkills?.includes(skill) || false
+              }
+              onChange={handleInputChange}
+            />
+            {skill}
+          </label>
+        ))}
+      </div>
+    </div>
+  )}
+</div>
+
+  {/* Wicket Keeper */}
     <div>
       <label className="block text-gray-700 mb-2">Wicket Keeper:<span className="text-red-500">*</span></label>
       <select
@@ -522,40 +724,7 @@ useEffect(() => {
 </select>
     </div>
 
-    {/* Batting */}
-    <div>
-      <label className="block text-gray-700 mb-2">Batting:<span className="text-red-500">*</span></label>
-      <select name="battingSkill" value={formData.battingSkill} onChange={handleInputChange} className="w-full border border-gray-300 rounded p-2 focus:ring-1 focus:ring-gray-400 outline-none" required>
-        <option value="">Select Option</option>
-        <option value="Right Hand">Right Hand</option>
-        <option value="Left Hand">Left Hand</option>
-      </select>
-    </div>
-
-    {/* Fielding Preference */}
-    <div>
-      <label className="block text-gray-700 mb-2">Fielding Preference:<span className="text-red-500">*</span></label>
-      <select name="fieldingPreference" value={formData.fieldingPreference} onChange={handleInputChange} className="w-full border border-gray-300 rounded p-2 focus:ring-1 focus:ring-gray-400 outline-none" required>
-        <option value="">Select Option</option>
-        <option value="Yes">Yes</option>
-        <option value="No">No</option>
-      </select>
-    </div>
-
-    {/* Specify Preference (Only shows if Fielding Preference is Yes) */}
-    {formData.fieldingPreference === 'Yes' && (
-      <div>
-        <label className="block text-gray-700 mb-2">Specify Preference:<span className="text-red-500">*</span></label>
-        <input 
-          name="fieldingDetails" 
-          value={formData.fieldingDetails || ''} 
-          onChange={handleInputChange} 
-          className="w-full border border-gray-300 rounded p-2 focus:ring-1 focus:ring-gray-400 outline-none" 
-          placeholder="Enter your specific preference" 
-          required
-        />
-      </div>
-    )}
+  
 
   </div>
 
@@ -570,13 +739,13 @@ useEffect(() => {
 
 
           <div>
-            <label className="block text-gray-700 mb-2">CRICHEROES ID<span className="text-red-500">*</span></label>
-            <input name="cricheroesId" value={formData.cricheroesId} onChange={handleInputChange} className="w-full border border-gray-300 rounded p-2 focus:ring-1 focus:ring-gray-400 outline-none" placeholder="Enter Cricheroes ID" required />
+            <label className="block text-gray-700 mb-2">CRICHEROES ID</label>
+            <input name="cricheroesId" value={formData.cricheroesId} onChange={handleInputChange} className="w-full border border-gray-300 rounded p-2 focus:ring-1 focus:ring-gray-400 outline-none" placeholder="Enter Cricheroes ID" />
           </div>
 
           <div>
             <label className="block text-gray-700 mb-2">INSTAGRAM ID</label>
-            <input name="instagramId" value={formData.instagramId} onChange={handleInputChange} className="w-full border border-gray-300 rounded p-2 focus:ring-1 focus:ring-gray-400 outline-none" placeholder="Enter Instagram ID" required />
+            <input name="instagramId" value={formData.instagramId} onChange={handleInputChange} className="w-full border border-gray-300 rounded p-2 focus:ring-1 focus:ring-gray-400 outline-none" placeholder="Enter Instagram ID" />
           </div>
         </div>
 
@@ -603,7 +772,7 @@ useEffect(() => {
           </div>
 
          {/* Conditional Receipt Upload Section */}
-{formData.paymentMethod === 'UPI' && (
+{formData.paymentMethod && (
   <div className="mt-4">
     <label className="block text-gray-700 mb-2">
       Upload Payment Receipt:<span className="text-red-500">*</span>
@@ -621,12 +790,21 @@ useEffect(() => {
         </button>
       </div>
     ) : (
-      <div
-        onClick={() => receiptInputRef.current.click()}
-        className="w-full md:w-64 h-32 border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center cursor-pointer hover:border-gray-500 transition text-center p-4 text-gray-500"
-      >
-        <span>CLICK TO UPLOAD RECEIPT</span>
-      </div>
+     <div className="flex flex-col gap-3">
+  <div
+    onClick={() => receiptInputRef.current.click()}
+    className="w-full md:w-64 h-16 border-2 border-dashed border-gray-300 rounded flex items-center justify-center cursor-pointer hover:border-gray-500 transition text-center text-gray-500"
+  >
+    <span>UPLOAD FROM FILES</span>
+  </div>
+
+  <div
+    onClick={() => cameraInputRef.current.click()}
+    className="w-full md:w-64 h-16 border-2 border-dashed border-gray-300 rounded flex items-center justify-center cursor-pointer hover:border-gray-500 transition text-center text-gray-500"
+  >
+    <span>OPEN CAMERA</span>
+  </div>
+</div>
     )}
     <input 
       type="file" 
@@ -635,6 +813,14 @@ useEffect(() => {
       className="hidden" 
       accept="image/*,application/pdf" 
     />
+    <input
+  type="file"
+  ref={cameraInputRef}
+  onChange={handleUtrReceiptChange}
+  className="hidden"
+  accept="image/*"
+  capture="environment"
+/>
   </div>
 )}
         </div>
@@ -643,16 +829,16 @@ useEffect(() => {
         {/* DECLARATION SECTION */}
         <div className="max-w-6xl mx-auto my-8">
           <div className="border border-gray-200 rounded-lg p-8 bg-[#f9f9f9]">
-            <h2 className="text-2xl font-normal text-gray-800 mb-6 border-b border-gray-300 pb-2">DECLARATION</h2>
+            <h2 className="text-2xl font-normal text-gray-800 mb-6 border-b border-gray-300 pb-2">घोषणा (DECLARATION)</h2>
 
             <ul className="list-disc list-outside ml-5 text-sm space-y-3 text-gray-700 mb-8">
-              <li>I hereby declare that all the information provided by me in this registration form is true and correct to the best of my knowledge.</li>
-              <li>I agree to abide by all the rules, regulations, and decisions of the organizers of the <strong>JAIN YOUTH CRICKET CUP</strong>.</li>
-              <li>I understand that any false information or misconduct may result in the cancellation of my registration or participation in the tournament.</li>
-              <li>I further agree that the organizers reserve the right to amend the tournament schedule, rules, regulations, fixtures, and event format whenever necessary in the interest of the tournament.</li>
+              <li>मैं एतद्द्वारा घोषणा करता हूँ कि इस पंजीकरण फॉर्म में मेरे द्वारा दी गई सभी जानकारी मेरी सर्वोत्तम जानकारी के अनुसार सत्य और सही है।</li>
+              <li>मैं जैन यूथ क्रिकेट कप (JAIN YOUTH CRICKET CUP) के आयोजकों के सभी नियमों, विनियमों और निर्णयों का पालन करने के लिए सहमत हूँ।</li>
+              <li>मैं समझता हूँ कि कोई भी गलत जानकारी या दुर्व्यवहार के परिणामस्वरूप मेरा पंजीकरण रद्द किया जा सकता है या मुझे टूर्नामेंट से बाहर किया जा सकता है।</li>
+              <li>मैं आगे यह भी सहमत हूँ कि आयोजकों के पास टूर्नामेंट के हित में आवश्यकतानुसार टूर्नामेंट की समय-सारिणी, नियमों, विनियमों, फिक्स्चर और इवेंट प्रारूप में संशोधन करने का अधिकार सुरक्षित है।</li>
             </ul>
 
-            <label className="flex items-center gap-3 cursor-pointer font-bold text-red-600">
+            <label className="flex items-center gap-3 cursor-pointer text-sm font-semibold text-red-600">
               <input
                 type="checkbox"
                 name="declarationAccepted"
@@ -661,7 +847,7 @@ useEffect(() => {
                 required
                 className="w-4 h-4"
               />
-              I have read the declaration above and I agree to all the terms and conditions mentioned.
+              मैंने ऊपर दी गई घोषणा को पढ़ लिया है और मैं उल्लेखित सभी नियमों और शर्तों से सहमत हूँ।
             </label>
           </div>
 

@@ -27,7 +27,7 @@ const AdminPanel = () => {
   const ALL = 'All';
   const [battingFilter, setBattingFilter] = useState(ALL);
   const [bowlingFilter, setBowlingFilter] = useState(ALL);
-  const [paceFilter, setPaceFilter] = useState(ALL);
+ 
 
   const rowsPerPage = 25;
   const navigate = useNavigate();
@@ -45,24 +45,23 @@ const AdminPanel = () => {
     const matchesBatting =
       battingFilter === ALL || p.skills?.batting === battingFilter;
 
-    const matchesBowling =
-      bowlingFilter === ALL || p.skills?.bowlingArm === bowlingFilter;
-
-    const matchesPace =
-      paceFilter === ALL || p.skills?.bowlingPace === paceFilter;
+  const matchesBowling =
+  bowlingFilter === ALL || p.skills?.bowling === bowlingFilter;
 
 
 
-    return matchesSearch && matchesBatting && matchesBowling && matchesPace;
+    return matchesSearch && matchesBatting && matchesBowling;
   });
+
+
   const totalPages = Math.ceil(filteredPlayers.length / rowsPerPage);
   const currentRows = filteredPlayers.slice(indexOfFirstRow, indexOfLastRow);
 
   const exportData = players.map((p, index) => ({
-    "S.No": index + 1,
+    "S.No": p.serialNumber,
     "Full Name": p.fullName,
     "Profession": p.profession,
-    "Date of Birth": p.dob ? new Date(p.dob).toLocaleDateString() : 'N/A', // Format date for readability
+    "Date of Birth": p.dob || 'N/A',
     "Gender": p.gender || 'N/A',
     "WhatsApp Number": p.whatsappNumber || 'N/A',
     "Email": p.emailId,
@@ -78,12 +77,9 @@ const AdminPanel = () => {
     "Lower Size": p.lowerSize || 'N/A',
 
     "Batting": p.skills?.batting || 'N/A',
-    "Bowling Arm": p.skills?.bowlingArm || 'N/A',
-    "Bowling Pace": p.skills?.bowlingPace || 'N/A',
-    "Wicket Keeping": p.wicketKeeping || 'No',
-    "Fielding Preference": p.skills?.fieldingPreference || 'No',
-    "Fielding Details": p.skills?.fieldingDetails || 'N/A',
+    "Bowling": p.skills?.bowling || 'N/A',
 
+    "Wicket Keeping": p.wicketKeeping || 'No',
     "Payment Method": p.paymentMethod || 'N/A', // Updated to match schema
     "CricHeroes ID": p.cricheroesId || 'N/A',
     "Instagram ID": p.instagramId || 'N/A',
@@ -199,25 +195,14 @@ const AdminPanel = () => {
                 }}
                 className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 outline-none transition cursor-pointer"
               >
-                <option value="All">Bowling Arm</option>
-                <option value="Right Hand">Right Hand</option>
-                <option value="Left Hand">Left Hand</option>
+                <option value="All">Bowling</option>
+              <option value="Right Hand Fast">Right Hand Fast</option>
+<option value="Left Hand Fast">Left Hand Fast</option>
+<option value="Right Hand Spinner">Right Hand Spinner</option>
+<option value="Left Hand Spinner">Left Hand Spinner</option>
               </select>
 
-              {/* Bowling Pace */}
-              <select
-                value={paceFilter}
-                onChange={(e) => {
-                  setPaceFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 outline-none transition cursor-pointer"
-              >
-                <option value="All">Bowling Pace</option>
-                <option value="Med Pace">Med Pace</option>
-                <option value="Off Spinner">Off Spinner</option>
-                <option value="Leg Spinner">Leg Spinner</option>
-              </select>
+            
             </div>
 
             {/* Search + Export */}
@@ -256,10 +241,9 @@ const AdminPanel = () => {
                   <th className="px-6 py-4">Image</th>
                   <th className="px-6 py-4">Name</th>
                   <th className="px-6 py-4">Phone</th>
-                  <th className="px-6 py-4">CricHeroes ID</th>
+                  <th className="px-6 py-4">Registration No.</th>
                   <th className="px-6 py-4">Batting</th>
                   <th className="px-6 py-4">Bowling</th>
-                  <th className="px-6 py-4">Bowling Pace</th>
                   <th className="px-6 py-4">Actions</th>
                 </tr>
               </thead>
@@ -298,7 +282,7 @@ const AdminPanel = () => {
                         </td>
 
                         <td className="px-6 py-4">
-                          {p.cricheroesId || "N/A"}
+                          {p.serialNumber || "N/A"}
                         </td>
 
                         <td className="px-6 py-4">
@@ -306,12 +290,10 @@ const AdminPanel = () => {
                         </td>
 
                         <td className="px-6 py-4">
-                          {p.skills?.bowlingArm || "N/A"}
+                          {p.skills?.bowling|| "N/A"}
                         </td>
 
-                        <td className="px-6 py-4">
-                          {p.skills?.bowlingPace || "N/A"}
-                        </td>
+              
 
                         <td className="px-6 py-4 flex items-center gap-2">
                           <button
