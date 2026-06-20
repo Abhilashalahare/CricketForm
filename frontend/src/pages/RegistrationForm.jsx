@@ -225,6 +225,7 @@ form.append('skills[allRounder]', JSON.stringify(formData.allRounderSkills));
     await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/register`, form, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
+    localStorage.setItem("giftPopupShown", "true");
     toast.success("Registration Successful!");
     setFormData(initialFormState);
   } catch (error) {
@@ -236,7 +237,7 @@ form.append('skills[allRounder]', JSON.stringify(formData.allRounderSkills));
 };
 
 const closeGiftPopup = () => {
-    localStorage.setItem("giftPopupShown", "true");
+    // localStorage.setItem("giftPopupShown", "true");
     setShowGiftPopup(false);
   };
 
@@ -904,8 +905,8 @@ useEffect(() => {
           className="w-40 h-40 rounded-lg object-contain"
         />
 
-        <p className="text-sm text-gray-500 mt-2">
-          Scan and complete payment
+        <p className="text-sm text-gray-700 mt-2 font-bold ">
+          Registration Charge : <span className='text-red-500 font-bold'>₹ 2100</span>
         </p>
       </div>
     )}
