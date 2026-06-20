@@ -40,16 +40,20 @@ export const registerPlayer = async (req, res) => {
       ? req.files['utrReceipt'][0].path
       : null;
 
+
+
+
     // 4. Create new player instance
     // We spread req.body to get all text fields, then override files and serial
     const newPlayer = new Player({
       ...req.body,
+        cricheroesId: req.body.cricheroesId || undefined,
+        instagramId: req.body.instagramId || undefined,
       whatsappNumber,
       submissionDate: req.body.submissionDate || new Date(),
       photo: photoPath,
       utrReceipt: receiptPath,
       serialNumber: formattedSerial,
-      // Note: Ensure your Aadhaar number is treated as a string, not a number
       aadharNumber: req.body.aadharNumber
     });
 

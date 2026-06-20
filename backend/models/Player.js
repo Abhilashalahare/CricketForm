@@ -54,13 +54,14 @@ whatsappNumber: {
  skills: {
   batting: {
     type: String,
-    enum: ['Right Hand', 'Left Hand'],
+    enum: ['','Right Hand', 'Left Hand'],
     default: ''
   },
 
   bowling: {
     type: String,
     enum: [
+      '',
       'Right Hand Fast',
       'Left Hand Fast',
       'Right Hand Spinner',
@@ -75,8 +76,7 @@ whatsappNumber: {
   }
 },
   // Social & Profiles
-  cricheroesId: { type: String, 
-   },
+  cricheroesId: { type: String, sparse: true, unique: true},
   instagramId: { type: String },
 
   // Payment

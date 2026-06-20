@@ -7,6 +7,7 @@ import { FaUpload } from 'react-icons/fa';
 import bgimg1 from '../assets/bgimg1.jpg';
 import bgimg2 from '../assets/bgimg2.jpg';
 import Navbar from '../components/Navbar';
+import qr from '../assets/qr.jpeg';
 
 
 const initialFormState = {
@@ -754,7 +755,7 @@ useEffect(() => {
 
 
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-6">
           {/* Payment Method Selector */}
           <div>
             <label className="block text-gray-700 mb-2">Payment Method:<span className="text-red-500">*</span></label>
@@ -772,57 +773,105 @@ useEffect(() => {
           </div>
 
          {/* Conditional Receipt Upload Section */}
+{/* Conditional Receipt Upload Section */}
 {formData.paymentMethod && (
   <div className="mt-4">
     <label className="block text-gray-700 mb-2">
-      Upload Payment Receipt:<span className="text-red-500">*</span>
+      {formData.paymentMethod === "UPI"
+        ? "Upload Payment Receipt:"
+        : "Capture Cash Payment Receipt:"}
+      <span className="text-red-500">*</span>
     </label>
 
     {formData.utrReceiptPreview ? (
       <div className="relative w-full h-32 border rounded overflow-hidden">
-        <img src={formData.utrReceiptPreview} className="w-full h-full object-cover" alt="Receipt Preview" />
+        <img
+          src={formData.utrReceiptPreview}
+          className="w-full h-full object-cover"
+          alt="Receipt Preview"
+        />
+
         <button
           type="button"
-          onClick={() => setFormData(prev => ({ ...prev, utrReceipt: null, utrReceiptPreview: null }))}
+          onClick={() =>
+            setFormData(prev => ({
+              ...prev,
+              utrReceipt: null,
+              utrReceiptPreview: null
+            }))
+          }
           className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-800"
         >
           ×
         </button>
       </div>
     ) : (
-     <div className="flex flex-col gap-3">
-  <div
-    onClick={() => receiptInputRef.current.click()}
-    className="w-full md:w-64 h-16 border-2 border-dashed border-gray-300 rounded flex items-center justify-center cursor-pointer hover:border-gray-500 transition text-center text-gray-500"
-  >
-    <span>UPLOAD FROM FILES</span>
-  </div>
+      <>
+        {/* UPI */}
+        {formData.paymentMethod === "UPI" && (
+          <div
+            onClick={() => receiptInputRef.current.click()}
+            className="w-full md:w-64 h-16 border-2 border-dashed border-gray-300 rounded flex items-center justify-center cursor-pointer hover:border-gray-500 transition text-center text-gray-500"
+          >
+            <span>UPLOAD RECEIPT</span>
+          </div>
+        )}
 
-  <div
-    onClick={() => cameraInputRef.current.click()}
-    className="w-full md:w-64 h-16 border-2 border-dashed border-gray-300 rounded flex items-center justify-center cursor-pointer hover:border-gray-500 transition text-center text-gray-500"
-  >
-    <span>OPEN CAMERA</span>
-  </div>
-</div>
+        {/* Cash */}
+        {formData.paymentMethod === "Cash" && (
+          <div
+            onClick={() => cameraInputRef.current.click()}
+            className="w-full md:w-64 h-16 border-2 border-dashed border-gray-300 rounded flex items-center justify-center cursor-pointer hover:border-gray-500 transition text-center text-gray-500"
+          >
+            <span>OPEN CAMERA</span>
+          </div>
+        )}
+      </>
     )}
-    <input 
-      type="file" 
-      ref={receiptInputRef} 
-      onChange={handleUtrReceiptChange} 
-      className="hidden" 
-      accept="image/*,application/pdf" 
-    />
+
+    {/* File Upload (UPI) */}
     <input
-  type="file"
-  ref={cameraInputRef}
-  onChange={handleUtrReceiptChange}
-  className="hidden"
-  accept="image/*"
-  capture="environment"
-/>
+      type="file"
+      ref={receiptInputRef}
+      onChange={handleUtrReceiptChange}
+      className="hidden"
+      accept="image/*,application/pdf"
+    />
+
+    {/* Camera Upload (Cash) */}
+    <input
+      type="file"
+      ref={cameraInputRef}
+      onChange={handleUtrReceiptChange}
+      className="hidden"
+      accept="image/*"
+      capture="environment"
+    />
   </div>
 )}
+
+
+ <div>
+    {formData.paymentMethod === "UPI" && (
+      <div className="flex flex-col">
+        <label className=" text-gray-700 mb-2">
+          Scan QR Code
+        </label>
+
+        <img
+          src={qr}
+          alt="UPI QR"
+          className="w-40 h-40 rounded-lg  object-contain"
+        />
+
+        <p className="text-sm text-gray-500 mt-2">
+          Scan and complete payment
+        </p>
+      </div>
+    )}
+  </div>
+
+
         </div>
 
 
