@@ -5,9 +5,18 @@ import GiftConfig from '../models/GiftConfig.js';
 
 // REGISTER PLAYER
 export const registerPlayer = async (req, res) => {
-  const whatsappNumber = req.body.whatsappNumber.startsWith("91")
-    ? req.body.whatsappNumber
-    : `91${req.body.whatsappNumber}`;
+ let whatsappNumber;
+  const rawNumber = req.body.whatsappNumber.replace(/\D/g, "");
+
+  if (rawNumber.length === 10) {
+    whatsappNumber = `91${rawNumber}`;
+  } else if (rawNumber.length === 12 && rawNumber.startsWith("91")) {
+    whatsappNumber = rawNumber;
+  } else {
+    return res.status(400).json({
+      error: "Invalid WhatsApp number"
+    });
+  }
   try {
     // 1. Validate that files were uploaded by the middleware
     if (!req.files || !req.files['photo']) {

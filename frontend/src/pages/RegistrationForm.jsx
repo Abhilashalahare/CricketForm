@@ -62,7 +62,7 @@ const initialFormState = {
 const RegistrationForm = () => {
   const fileInputRef = useRef(null);
   const receiptInputRef = useRef(null);
-  const cameraInputRef = useRef(null);
+
 
   const [showGiftPopup, setShowGiftPopup] = useState(false);
   const [giftInfo, setGiftInfo] = useState(null);
