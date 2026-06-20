@@ -323,7 +323,7 @@ useEffect(() => {
               )}
             </div>
 
-            <input type="file" ref={fileInputRef} onChange={handlePhotoChange} className="hidden" accept="image/*" />
+            <input type="file" ref={fileInputRef} onChange={handlePhotoChange} className="hidden"  accept="image/*,application/pdf" />
           </div>
           {/* Player Name */}
           <div>
@@ -821,112 +821,87 @@ useEffect(() => {
 
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-6">
-          {/* Payment Method Selector */}
-          <div>
-            <label className="block text-gray-700 mb-2">Payment Method:<span className="text-red-500">*</span></label>
-            <select
-              name="paymentMethod"
-              value={formData.paymentMethod}
-              onChange={handleInputChange}
-              className="w-full border border-gray-300 rounded p-2 focus:ring-1 focus:ring-gray-400 outline-none"
-              required
-            >
-              <option value="">Select Payment</option>
-              <option value="UPI">UPI</option>
-              <option value="Cash">Cash</option>
-            </select>
-          </div>
-
-         {/* Conditional Receipt Upload Section */}
-{/* Conditional Receipt Upload Section */}
-{formData.paymentMethod && (
-  <div className="mt-4">
+  {/* Payment Method Selector */}
+  <div>
     <label className="block text-gray-700 mb-2">
-      {formData.paymentMethod === "UPI"
-        ? "Upload Payment Receipt:"
-        : "Capture Cash Payment Receipt:"}
-      <span className="text-red-500">*</span>
+      Payment Method:<span className="text-red-500">*</span>
     </label>
 
-    {formData.utrReceiptPreview ? (
-      <div className="relative w-full h-32 border rounded overflow-hidden">
-        <img
-          src={formData.utrReceiptPreview}
-          className="w-full h-full object-cover"
-          alt="Receipt Preview"
-        />
-
-        <button
-          type="button"
-          onClick={() =>
-            setFormData(prev => ({
-              ...prev,
-              utrReceipt: null,
-              utrReceiptPreview: null
-            }))
-          }
-          className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-800"
-        >
-          ×
-        </button>
-      </div>
-    ) : (
-      <>
-        {/* UPI */}
-        {formData.paymentMethod === "UPI" && (
-          <div
-            onClick={() => receiptInputRef.current.click()}
-            className="w-full md:w-64 h-16 border-2 border-dashed border-gray-300 rounded flex items-center justify-center cursor-pointer hover:border-gray-500 transition text-center text-gray-500"
-          >
-            <span>UPLOAD RECEIPT</span>
-          </div>
-        )}
-
-        {/* Cash */}
-        {formData.paymentMethod === "Cash" && (
-          <div
-            onClick={() => cameraInputRef.current.click()}
-            className="w-full md:w-64 h-16 border-2 border-dashed border-gray-300 rounded flex items-center justify-center cursor-pointer hover:border-gray-500 transition text-center text-gray-500"
-          >
-            <span>OPEN CAMERA</span>
-          </div>
-        )}
-      </>
-    )}
-
-    {/* File Upload (UPI) */}
-    <input
-      type="file"
-      ref={receiptInputRef}
-      onChange={handleUtrReceiptChange}
-      className="hidden"
-      accept="image/*,application/pdf"
-    />
-
-    {/* Camera Upload (Cash) */}
-    <input
-      type="file"
-      ref={cameraInputRef}
-      onChange={handleUtrReceiptChange}
-      className="hidden"
-      accept="image/*"
-      capture="environment"
-    />
+    <select
+      name="paymentMethod"
+      value={formData.paymentMethod}
+      onChange={handleInputChange}
+      className="w-full border border-gray-300 rounded p-2 focus:ring-1 focus:ring-gray-400 outline-none"
+      required
+    >
+      <option value="">Select Payment</option>
+      <option value="UPI">UPI</option>
+      <option value="Cash">Cash</option>
+    </select>
   </div>
-)}
 
+  {/* Upload Receipt */}
+  {formData.paymentMethod && (
+    <div className="mt-4">
+      <label className="block text-gray-700 mb-2">
+        Upload Payment Receipt:
+        <span className="text-red-500">*</span>
+      </label>
 
- <div>
+      {formData.utrReceiptPreview ? (
+        <div className="relative w-full h-32 border rounded overflow-hidden">
+          <img
+            src={formData.utrReceiptPreview}
+            className="w-full h-full object-cover"
+            alt="Receipt Preview"
+          />
+
+          <button
+            type="button"
+            onClick={() =>
+              setFormData(prev => ({
+                ...prev,
+                utrReceipt: null,
+                utrReceiptPreview: null,
+              }))
+            }
+            className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-800"
+          >
+            ×
+          </button>
+        </div>
+      ) : (
+        <div
+           onClick={() => receiptInputRef.current.click()}
+          className="w-full md:w-64 h-16 border-2 border-dashed border-gray-300 rounded flex items-center justify-center cursor-pointer hover:border-gray-500 transition text-center text-gray-500"
+        >
+          <span>UPLOAD RECEIPT</span>
+        </div>
+      )}
+
+      {/* Single Input for BOTH UPI & Cash */}
+      <input
+  type="file"
+  ref={receiptInputRef}
+  onChange={handleUtrReceiptChange}
+  className="hidden"
+  accept="image/*,application/pdf"
+/>
+    </div>
+  )}
+
+  {/* QR Code */}
+  <div>
     {formData.paymentMethod === "UPI" && (
       <div className="flex flex-col items-center">
-        <label className=" text-gray-700 mb-2">
+        <label className="text-gray-700 mb-2">
           Scan QR Code
         </label>
 
         <img
           src={qr}
           alt="UPI QR"
-          className="w-40 h-40 rounded-lg  object-contain"
+          className="w-40 h-40 rounded-lg object-contain"
         />
 
         <p className="text-sm text-gray-500 mt-2">
@@ -935,9 +910,7 @@ useEffect(() => {
       </div>
     )}
   </div>
-
-
-        </div>
+</div>
 
 
         {/* DECLARATION SECTION */}
