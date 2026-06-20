@@ -4,7 +4,8 @@ import {
   registerPlayer, 
   getAllPlayers, 
   getPlayerById, 
-  deletePlayer 
+  deletePlayer, 
+  getGiftStatus
 } from '../controllers/PlayerController.js';
 import Counter from '../models/Counter.js';
 import { upload } from '../middleware/upload.js';
@@ -29,5 +30,7 @@ router.post('/admin/init-counter', async (req, res) => {
 router.get('/admin/players', verifyToken, getAllPlayers);
 router.get('/admin/players/:id', verifyToken, getPlayerById);
 router.delete('/admin/players/:id', verifyToken, deletePlayer);
+
+router.get("/gift-status", getGiftStatus);
 
 export default router;

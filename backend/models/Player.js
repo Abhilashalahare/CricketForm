@@ -84,6 +84,11 @@ whatsappNumber: {
  
   utrReceipt: { type: String }, 
 
+  giftAllocated: {
+    type: Boolean,
+    default: false
+  },
+
   // Declaration
   declarationAccepted: { type: Boolean, required: true },
   signatureName: { type: String, required: true, trim: true },

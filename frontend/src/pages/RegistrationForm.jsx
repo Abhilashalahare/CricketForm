@@ -8,6 +8,7 @@ import bgimg1 from '../assets/bgimg1.jpg';
 import bgimg2 from '../assets/bgimg2.jpg';
 import Navbar from '../components/Navbar';
 import qr from '../assets/qr.jpeg';
+import GiftPopup from '../components/GiftPopup';
 
 
 const initialFormState = {
@@ -62,6 +63,9 @@ const RegistrationForm = () => {
   const fileInputRef = useRef(null);
   const receiptInputRef = useRef(null);
   const cameraInputRef = useRef(null);
+
+  const [showGiftPopup, setShowGiftPopup] = useState(false);
+  const [giftInfo, setGiftInfo] = useState(null);
 
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -231,16 +235,45 @@ form.append('skills[allRounder]', JSON.stringify(formData.allRounderSkills));
   }
 };
 
-
+const closeGiftPopup = () => {
+    localStorage.setItem("giftPopupShown", "true");
+    setShowGiftPopup(false);
+  };
 
 useEffect(() => {
   setFormData(prev => ({ ...prev, submissionDate: today }));
 }, [today]);
 
-  
+useEffect(() => {
+    const popupShown = localStorage.getItem("giftPopupShown");
+
+    if (popupShown) return;
+
+    const fetchGiftStatus = async () => {
+      try {
+        const res = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/gift-status`,
+        );
+
+        if (res.data.giftAvailable) {
+          setGiftInfo(res.data);
+          setShowGiftPopup(true);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchGiftStatus();
+  }, []);
 
   return (
     <div className="min-h-screen bg-white text-gray-900 font-sans">
+
+      {showGiftPopup && giftInfo && (
+        <GiftPopup giftInfo={giftInfo} onClose={closeGiftPopup} />
+      )}
+
      {/* Navbar */}
      <Navbar/>
 
@@ -560,10 +593,20 @@ useEffect(() => {
 
 {/* Batting Section */}
 <div className="mb-4">
-  <label className="flex items-center gap-1 cursor-pointer text-gray-700">
+ <label
+  className={`flex items-center gap-1 text-gray-700 ${
+    formData.hasBowling === "Yes" ||
+    formData.playerType === "All Rounder"
+      ? "opacity-50 cursor-not-allowed"
+      : "cursor-pointer"
+  }`}
+>
     <input
       type="checkbox"
-      checked={formData.hasBatting === "Yes"}
+  checked={formData.hasBatting === "Yes"}
+  disabled={
+    formData.hasBowling === "Yes" ||
+    formData.playerType === "All Rounder"}
       onChange={(e) =>
         handleInputChange({
           target: {
@@ -596,10 +639,21 @@ useEffect(() => {
 
 {/* Bowling Section */}
 <div className="mb-4">
-  <label className="flex items-center cursor-pointer gap-1 text-gray-700">
+ <label
+  className={`flex items-center gap-1 text-gray-700 ${
+    formData.hasBatting === "Yes" ||
+    formData.playerType === "All Rounder"
+      ? "opacity-50 cursor-not-allowed"
+      : "cursor-pointer"
+  }`}
+>
     <input
-      type="checkbox"
-      checked={formData.hasBowling === "Yes"}
+       type="checkbox"
+  checked={formData.hasBowling === "Yes"}
+  disabled={
+    formData.hasBatting === "Yes" ||
+    formData.playerType === "All Rounder"
+  }
       onChange={(e) =>
         handleInputChange({
           target: {
@@ -634,10 +688,21 @@ useEffect(() => {
 
 {/* All Rounder Section */}
 <div className="mb-4">
-  <label className="flex items-center gap-1 cursor-pointer text-gray-700">
+ <label
+  className={`flex items-center gap-1 text-gray-700 ${
+    formData.hasBatting === "Yes" ||
+    formData.hasBowling === "Yes"
+      ? "opacity-50 cursor-not-allowed"
+      : "cursor-pointer"
+  }`}
+>
     <input
-      type="checkbox"
-      checked={formData.playerType === "All Rounder"}
+        type="checkbox"
+  checked={formData.playerType === "All Rounder"}
+  disabled={
+    formData.hasBatting === "Yes" ||
+    formData.hasBowling === "Yes"
+  }
       onChange={(e) =>
         handleInputChange({
           target: {
@@ -853,7 +918,7 @@ useEffect(() => {
 
  <div>
     {formData.paymentMethod === "UPI" && (
-      <div className="flex flex-col">
+      <div className="flex flex-col items-center">
         <label className=" text-gray-700 mb-2">
           Scan QR Code
         </label>

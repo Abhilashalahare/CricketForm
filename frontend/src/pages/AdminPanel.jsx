@@ -27,7 +27,7 @@ const AdminPanel = () => {
   const ALL = 'All';
   const [battingFilter, setBattingFilter] = useState(ALL);
   const [bowlingFilter, setBowlingFilter] = useState(ALL);
- 
+
 
   const rowsPerPage = 25;
   const navigate = useNavigate();
@@ -45,8 +45,8 @@ const AdminPanel = () => {
     const matchesBatting =
       battingFilter === ALL || p.skills?.batting === battingFilter;
 
-  const matchesBowling =
-  bowlingFilter === ALL || p.skills?.bowling === bowlingFilter;
+    const matchesBowling =
+      bowlingFilter === ALL || p.skills?.bowling === bowlingFilter;
 
 
 
@@ -105,7 +105,7 @@ const AdminPanel = () => {
     }
   };
 
-    useEffect(() => {
+  useEffect(() => {
     fetchPlayers();
   }, []);
 
@@ -196,13 +196,13 @@ const AdminPanel = () => {
                 className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 outline-none transition cursor-pointer"
               >
                 <option value="All">Bowling</option>
-              <option value="Right Hand Fast">Right Hand Fast</option>
-<option value="Left Hand Fast">Left Hand Fast</option>
-<option value="Right Hand Spinner">Right Hand Spinner</option>
-<option value="Left Hand Spinner">Left Hand Spinner</option>
+                <option value="Right Hand Fast">Right Hand Fast</option>
+                <option value="Left Hand Fast">Left Hand Fast</option>
+                <option value="Right Hand Spinner">Right Hand Spinner</option>
+                <option value="Left Hand Spinner">Left Hand Spinner</option>
               </select>
 
-            
+
             </div>
 
             {/* Search + Export */}
@@ -239,11 +239,12 @@ const AdminPanel = () => {
                 <tr>
                   <th className="px-6 py-4">S.No</th>
                   <th className="px-6 py-4">Image</th>
+                  <th className="px-6 py-4">Registration No.</th>
                   <th className="px-6 py-4">Name</th>
                   <th className="px-6 py-4">Phone</th>
-                  <th className="px-6 py-4">Registration No.</th>
                   <th className="px-6 py-4">Batting</th>
                   <th className="px-6 py-4">Bowling</th>
+                  <th className="px-6 py-4">Gift</th>
                   <th className="px-6 py-4">Actions</th>
                 </tr>
               </thead>
@@ -261,17 +262,21 @@ const AdminPanel = () => {
 
                         <td className="px-6 py-4">
                           {p.photo ? (
-    <img
-      // Concatenate the backend URL with the path stored in the database
-      src={`${import.meta.env.VITE_BACKEND_URL}/${p.photo}`}
-      alt="Player"
-      className="w-12 h-12 rounded-full object-cover border"
-      onError={(e) => {  e.target.src = defaultAvatar; }} // Fallback if image fails
-    />
-  ) : (
-    <FaUserCircle className="text-gray-400 text-5xl" />
-  )}
-</td>
+                            <img
+                              // Concatenate the backend URL with the path stored in the database
+                              src={`${import.meta.env.VITE_BACKEND_URL}/${p.photo}`}
+                              alt="Player"
+                              className="w-12 h-12 rounded-full object-cover border"
+                              onError={(e) => { e.target.src = defaultAvatar; }} // Fallback if image fails
+                            />
+                          ) : (
+                            <FaUserCircle className="text-gray-400 text-5xl" />
+                          )}
+                        </td>
+                        
+                         <td className="px-6 py-4">
+                          {p.serialNumber || "N/A"}
+                        </td>
 
                         <td className="px-6 py-4 font-medium">
                           {p.fullName}
@@ -281,19 +286,21 @@ const AdminPanel = () => {
                           {p.whatsappNumber}
                         </td>
 
-                        <td className="px-6 py-4">
-                          {p.serialNumber || "N/A"}
-                        </td>
+                        
 
                         <td className="px-6 py-4">
                           {p.skills?.batting || "N/A"}
                         </td>
 
                         <td className="px-6 py-4">
-                          {p.skills?.bowling|| "N/A"}
+                          {p.skills?.bowling || "N/A"}
                         </td>
 
-              
+                        <td className="px-6 py-4">
+                          {p.giftAllocated ? "Yes" : "No"}
+                        </td>
+
+
 
                         <td className="px-6 py-4 flex items-center gap-2">
                           <button

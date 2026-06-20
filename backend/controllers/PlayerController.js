@@ -1,6 +1,7 @@
 import Player from '../models/Player.js';
 import Counter from '../models/Counter.js';
 import {sendWhatsAppMessage} from '../services/whatsappService.js'
+import GiftConfig from '../models/GiftConfig.js';
 
 // REGISTER PLAYER
 export const registerPlayer = async (req, res) => {
@@ -41,7 +42,24 @@ export const registerPlayer = async (req, res) => {
       : null;
 
 
+     let giftAllocated = false;
 
+    // Atomic update (safe for concurrent registrations)
+    const gift = await GiftConfig.findOneAndUpdate(
+      {
+        claimed: { $lt: 50 }
+      },
+      {
+        $inc: { claimed: 1 }
+      },
+      {
+        new: true
+      }
+    );
+
+    if (gift) {
+      giftAllocated = true;
+    }
 
     // 4. Create new player instance
     // We spread req.body to get all text fields, then override files and serial
@@ -54,7 +72,10 @@ export const registerPlayer = async (req, res) => {
       photo: photoPath,
       utrReceipt: receiptPath,
       serialNumber: formattedSerial,
+      giftAllocated,
       aadharNumber: req.body.aadharNumber
+
+
     });
 
     await newPlayer.save();
@@ -63,7 +84,8 @@ export const registerPlayer = async (req, res) => {
     sendWhatsAppMessage(
       newPlayer.whatsappNumber,
       newPlayer.fullName,
-      formattedSerial
+      formattedSerial,
+      giftAllocated,
     ).catch(err => {
       console.error("WhatsApp Error:", err.message);
     });
@@ -141,5 +163,34 @@ export const deletePlayer = async (req, res) => {
     res.json({ message: 'Player deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete player' });
+  }
+};
+
+export const getGiftStatus = async (req, res) => {
+  try {
+
+    let gift = await GiftConfig.findOne();
+
+    if (!gift) {
+
+      gift = await GiftConfig.create({
+        name: "First 50 Gift Offer",
+        limit: 50,
+        claimed: 0
+      });
+
+    }
+
+    res.json({
+      totalSlots: gift.limit,
+      claimedSlots: gift.claimed,
+      remainingSeats: gift.limit - gift.claimed,
+      giftAvailable: gift.claimed < gift.limit
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      error: error.message
+    });
   }
 };
